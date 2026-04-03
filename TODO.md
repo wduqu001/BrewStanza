@@ -3,24 +3,24 @@
 ## Week 1 — Foundation
 
 ### 1.1 Project Setup
-- [ ] Create GitHub repository `brewstanza` with README
-- [ ] Initialize Python project (`pyproject.toml`)
-- [ ] Setup directory structure (`src/`, `tests/`, `docs/`)
-- [ ] Install dependencies (click, rich, toml, pytest, pytest-cov)
-- [ ] Setup virtual environment + `requirements.txt`
-- [ ] Add `.gitignore`
-- [ ] Configure pytest in `pyproject.toml`
+- [x] Create GitHub repository `brewstanza` with README
+- [x] Initialize Python project (`pyproject.toml`)
+- [x] Setup directory structure (`src/`, `tests/`, `docs/`)
+- [x] Install dependencies (click, rich, toml, pytest, pytest-cov)
+- [x] Setup virtual environment + `requirements.txt` (venv created)
+- [x] Add `.gitignore`
+- [x] Configure pytest in `pyproject.toml`
 
 ### 1.2 CLI Foundation
-- [ ] Create CLI entry (`src/brewstanza/cli.py`)
-- [ ] Implement main command group (`brewstanza`)
-- [ ] Add `brew` subcommand
-- [ ] Add `apps` subcommand
-- [ ] Add `--version` and `--help`
-- [ ] Configure console script entry point
+- [x] Create CLI entry (`src/brewstanza/cli.py`)
+- [x] Implement main command group (`brewstanza`)
+- [x] Add `brew` subcommand
+- [x] Add `apps` subcommand
+- [x] Add `--version` and `--help`
+- [x] Configure console script entry point
 
 ### 1.3 Homebrew Scanner
-- [ ] Create scanner module
+- [x] Create scanner module
 - [ ] Implement `run_brew_command()`
 - [ ] Implement `list_formulae()`
 - [ ] Implement `list_casks()`
@@ -29,9 +29,9 @@
 - [ ] Implement `calculate_package_size()`
 
 ### 1.4 UI Renderer
-- [ ] Create UI module
-- [ ] Setup Rich renderer
-- [ ] Implement package table rendering
+- [x] Create UI module
+- [x] Setup Rich renderer
+- [x] Implement package table rendering
 - [ ] Implement package detail view
 
 ### Week 1 Deliverables
