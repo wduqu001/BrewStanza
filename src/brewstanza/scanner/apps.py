@@ -2,21 +2,20 @@
 Application Scanner Module - Scan and analyze installed macOS applications.
 """
 
-import plistlib
 from pathlib import Path
 from typing import Optional
 
 
 class AppScanner:
     """Scanner for macOS applications (.app bundles)."""
-    
+
     # Standard application directories
     SYSTEM_APPS = Path("/Applications")
     USER_APPS = Path.home() / "Applications"
-    
+
     def __init__(self):
         self._apps_cache: Optional[list] = None
-    
+
     def scan_directory(self, directory: Path) -> list[Path]:
         """
         Scan a directory for .app bundles.
@@ -29,7 +28,7 @@ class AppScanner:
         """
         # TODO: Implement in Week 2
         return []
-    
+
     def scan_all_applications(self) -> list[dict]:
         """
         Scan all standard application directories.
@@ -39,7 +38,7 @@ class AppScanner:
         """
         # TODO: Implement in Week 2
         return []
-    
+
     def parse_info_plist(self, app_path: Path) -> dict:
         """
         Parse an app's Info.plist for metadata.
@@ -52,7 +51,7 @@ class AppScanner:
         """
         # TODO: Implement in Week 2
         return {}
-    
+
     def get_app_info(self, app_path: Path) -> dict:
         """
         Get comprehensive app information.
@@ -65,7 +64,7 @@ class AppScanner:
         """
         # TODO: Implement in Week 2
         return {}
-    
+
     def calculate_app_size(self, app_path: Path) -> int:
         """
         Calculate the size of an app bundle.
@@ -78,7 +77,7 @@ class AppScanner:
         """
         # TODO: Implement in Week 2
         return 0
-    
+
     def is_homebrew_cask(self, app_path: Path) -> bool:
         """
         Check if an app was installed via Homebrew cask.
@@ -91,7 +90,7 @@ class AppScanner:
         """
         # TODO: Implement in Week 2
         return False
-    
+
     def deduplicate_apps(self, apps: list[dict]) -> list[dict]:
         """
         Remove duplicate app entries (Homebrew cask vs /Applications).

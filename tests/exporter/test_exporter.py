@@ -4,8 +4,6 @@ import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-import pytest
-
 from brewstanza.exporter.export import ExportManager
 
 

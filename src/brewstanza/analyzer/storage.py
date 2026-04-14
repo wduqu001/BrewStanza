@@ -2,17 +2,16 @@
 Storage Analyzer Module - Calculate and aggregate storage metrics.
 """
 
-from pathlib import Path
 from typing import Optional
 
 
 class StorageAnalyzer:
     """Analyzer for storage consumption metrics."""
-    
+
     def __init__(self):
         self._homebrew_total: Optional[int] = None
         self._apps_total: Optional[int] = None
-    
+
     def calculate_total_homebrew_storage(self) -> int:
         """
         Calculate total storage used by Homebrew.
@@ -28,7 +27,7 @@ class StorageAnalyzer:
         """
         # Note: this function is a placeholder until actual scanning logic is added.
         return self._homebrew_total or 0
-    
+
     def calculate_total_app_storage(self, apps: list[dict]) -> int:
         """
         Calculate total storage used by applications.
@@ -50,7 +49,7 @@ class StorageAnalyzer:
             total += size
         self._apps_total = total
         return total
-    
+
     def get_top_consumers(self, items: list[dict], n: int = 10) -> list[dict]:
         """
         Get top N largest items by size.
@@ -68,7 +67,7 @@ class StorageAnalyzer:
             reverse=True,
         )
         return sorted_items[:n]
-    
+
     def get_percentage_distribution(self, sizes: dict[str, int]) -> dict[str, float]:
         """
         Calculate percentage distribution of sizes.
@@ -89,7 +88,7 @@ class StorageAnalyzer:
             else 0.0
             for key, value in sizes.items()
         }
-    
+
     @staticmethod
     def format_size(size_bytes: int) -> str:
         """

@@ -3,6 +3,7 @@ Tests for BrewStanza Homebrew scanner.
 """
 
 from pathlib import Path
+
 import pytest
 
 from brewstanza.scanner.homebrew import HomebrewScanner

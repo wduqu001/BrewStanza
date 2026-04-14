@@ -38,9 +38,9 @@ def brew(ctx: click.Context) -> None:
 
 
 @brew.command("list")
-@click.option("--formula", "-f", "formula_only", is_flag=True, 
+@click.option("--formula", "-f", "formula_only", is_flag=True,
               help="List only formulae")
-@click.option("--cask", "-c", "cask_only", is_flag=True, 
+@click.option("--cask", "-c", "cask_only", is_flag=True,
               help="List only casks")
 @click.option("--size", "-s", is_flag=True, default=True,
               help="Show package sizes (default: True)")
@@ -48,11 +48,11 @@ def brew(ctx: click.Context) -> None:
 def brew_list(ctx: click.Context, formula_only: bool, cask_only: bool, size: bool) -> None:
     """List installed Homebrew packages with sizes."""
     console = ctx.obj["console"]
-    
+
     # TODO: Implement in Week 1
     console.print("[yellow]⚠️  Homebrew scanner not yet implemented[/yellow]")
     console.print("[dim]This feature will be available after Week 1[/dim]")
-    
+
     if formula_only:
         console.print("[dim]Filter: formulae only[/dim]")
     elif cask_only:
@@ -65,7 +65,7 @@ def brew_list(ctx: click.Context, formula_only: bool, cask_only: bool, size: boo
 def brew_info(ctx: click.Context, package: str) -> None:
     """Show detailed information about a package."""
     console = ctx.obj["console"]
-    
+
     # TODO: Implement in Week 1
     console.print(f"[yellow]⚠️  Package info for '{package}' not yet implemented[/yellow]")
     console.print("[dim]This feature will be available after Week 1[/dim]")
@@ -76,7 +76,7 @@ def brew_info(ctx: click.Context, package: str) -> None:
 def brew_outdated(ctx: click.Context) -> None:
     """List outdated packages."""
     console = ctx.obj["console"]
-    
+
     # TODO: Implement in Week 1
     console.print("[yellow]⚠️  Outdated packages check not yet implemented[/yellow]")
     console.print("[dim]This feature will be available after Week 1[/dim]")
@@ -94,7 +94,7 @@ def apps(ctx: click.Context) -> None:
 
 
 @apps.command("list")
-@click.option("--category", "-c", is_flag=True, 
+@click.option("--category", "-c", is_flag=True,
               help="Group apps by category")
 @click.option("--size", "-s", is_flag=True, default=True,
               help="Show app sizes (default: True)")
@@ -102,11 +102,11 @@ def apps(ctx: click.Context) -> None:
 def apps_list(ctx: click.Context, category: bool, size: bool) -> None:
     """List installed applications."""
     console = ctx.obj["console"]
-    
+
     # TODO: Implement in Week 2
     console.print("[yellow]⚠️  Application scanner not yet implemented[/yellow]")
     console.print("[dim]This feature will be available after Week 2[/dim]")
-    
+
     if category:
         console.print("[dim]Grouping: by category[/dim]")
 
@@ -117,7 +117,7 @@ def apps_list(ctx: click.Context, category: bool, size: bool) -> None:
 def apps_info(ctx: click.Context, app_name: str) -> None:
     """Show app details with removal instructions."""
     console = ctx.obj["console"]
-    
+
     # TODO: Implement in Week 2
     console.print(f"[yellow]⚠️  App info for '{app_name}' not yet implemented[/yellow]")
     console.print("[dim]This feature will be available after Week 2[/dim]")
@@ -134,11 +134,11 @@ def apps_info(ctx: click.Context, app_name: str) -> None:
 def storage(ctx: click.Context, top: int, category: bool) -> None:
     """Display storage analytics and breakdown."""
     console = ctx.obj["console"]
-    
+
     # TODO: Implement in Week 2
     console.print("[yellow]⚠️  Storage analyzer not yet implemented[/yellow]")
     console.print("[dim]This feature will be available after Week 2[/dim]")
-    
+
     console.print(f"[dim]Top consumers: {top}[/dim]")
     if category:
         console.print("[dim]View: category breakdown only[/dim]")
@@ -162,7 +162,7 @@ def export(ctx: click.Context) -> None:
 def export_json(ctx: click.Context, output: str) -> None:
     """Export configuration to JSON format."""
     console = ctx.obj["console"]
-    
+
     # TODO: Implement in Week 3
     console.print("[yellow]⚠️  JSON export not yet implemented[/yellow]")
     console.print("[dim]This feature will be available after Week 3[/dim]")
@@ -175,7 +175,7 @@ def export_json(ctx: click.Context, output: str) -> None:
 def export_markdown(ctx: click.Context, output: str) -> None:
     """Export configuration to Markdown format."""
     console = ctx.obj["console"]
-    
+
     # TODO: Implement in Week 3
     console.print("[yellow]⚠️  Markdown export not yet implemented[/yellow]")
     console.print("[dim]This feature will be available after Week 3[/dim]")
@@ -188,7 +188,7 @@ def export_markdown(ctx: click.Context, output: str) -> None:
 def export_brewfile(ctx: click.Context, output: str) -> None:
     """Export configuration to Brewfile format."""
     console = ctx.obj["console"]
-    
+
     # TODO: Implement in Week 3
     console.print("[yellow]⚠️  Brewfile export not yet implemented[/yellow]")
     console.print("[dim]This feature will be available after Week 3[/dim]")
@@ -206,11 +206,11 @@ def export_brewfile(ctx: click.Context, output: str) -> None:
 def sync(ctx: click.Context, repo: str, token: str, message: str) -> None:
     """Sync configuration to GitHub repository."""
     console = ctx.obj["console"]
-    
+
     # TODO: Implement in Week 3
     console.print("[yellow]⚠️  GitHub sync not yet implemented[/yellow]")
     console.print("[dim]This feature will be available after Week 3[/dim]")
-    
+
     if repo:
         console.print(f"[dim]Target repo: {repo}[/dim]")
 

@@ -29,6 +29,7 @@ import asyncio
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from rich import box
 from rich.console import Console
 from rich.progress import (
     BarColumn,
@@ -40,7 +41,6 @@ from rich.progress import (
     TimeElapsedColumn,
 )
 from rich.table import Table
-from rich import box
 
 CONCURRENCY = 8          # max simultaneous `du` subprocesses
 DU_TIMEOUT  = 30.0       # seconds before we give up on a single path
