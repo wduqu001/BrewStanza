@@ -33,13 +33,13 @@ class StorageAnalyzer:
     def calculate_total_homebrew_storage(self) -> int:
         """
         Calculate total storage used by Homebrew.
-        
+
         Includes:
         - Cellar (formulae)
         - Caskroom (casks)
         - Cache
         - Logs
-        
+
         Returns:
             Total size in bytes
         """
@@ -49,10 +49,10 @@ class StorageAnalyzer:
     def calculate_total_app_storage(self, apps: list[dict[str, Any]]) -> int:
         """
         Calculate total storage used by applications.
-        
+
         Args:
             apps: List of app dictionaries from AppScanner
-        
+
         Returns:
             Total size in bytes
         """
@@ -68,20 +68,26 @@ class StorageAnalyzer:
         self._apps_total = total
         return total
 
-    def get_top_consumers(self, items: list[dict[str, Any]], n: int = 10) -> list[dict[str, Any]]:
+    def get_top_consumers(
+        self, items: list[dict[str, Any]], n: int = 10
+    ) -> list[dict[str, Any]]:
         """
         Get top N largest items by size.
-        
+
         Args:
             items: List of item dictionaries with 'size' key
             n: Number of top items to return
-            
+
         Returns:
             Sorted list of top N items
         """
         sorted_items = sorted(
             items,
-            key=lambda item: (item.get("size", 0) if isinstance(item.get("size", 0), (int, float)) else 0),
+            key=lambda item: (
+                item.get("size", 0)
+                if isinstance(item.get("size", 0), (int, float))
+                else 0
+            ),
             reverse=True,
         )
         return sorted_items[:n]
@@ -89,21 +95,21 @@ class StorageAnalyzer:
     def get_percentage_distribution(self, sizes: dict[str, int]) -> dict[str, float]:
         """
         Calculate percentage distribution of sizes.
-        
+
         Args:
             sizes: Dictionary mapping names to sizes
-            
+
         Returns:
             Dictionary mapping names to percentages (0-100)
         """
-        total = sum(value for value in sizes.values() if isinstance(value, (int, float)))
+        total = sum(
+            value for value in sizes.values() if isinstance(value, (int, float))
+        )
         if total <= 0:
             return {key: 0.0 for key in sizes}
 
         return {
-            key: float(value) / total * 100
-            if isinstance(value, (int, float))
-            else 0.0
+            key: float(value) / total * 100 if isinstance(value, (int, float)) else 0.0
             for key, value in sizes.items()
         }
 
@@ -111,10 +117,10 @@ class StorageAnalyzer:
     def format_size(size_bytes: int) -> str:
         """
         Format bytes to human-readable string.
-        
+
         Args:
             size_bytes: Size in bytes
-            
+
         Returns:
             Human-readable string (e.g., "1.5 GB")
         """

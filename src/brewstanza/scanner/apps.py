@@ -19,10 +19,10 @@ class AppScanner:
     def scan_directory(self, directory: Path) -> list[Path]:
         """
         Scan a directory for .app bundles.
-        
+
         Args:
             directory: Path to scan
-            
+
         Returns:
             List of paths to .app bundles
         """
@@ -32,7 +32,7 @@ class AppScanner:
     def scan_all_applications(self) -> list[dict[str, Any]]:
         """
         Scan all standard application directories.
-        
+
         Returns:
             List of app dictionaries with metadata
         """
@@ -42,10 +42,10 @@ class AppScanner:
     def parse_info_plist(self, app_path: Path) -> dict[str, Any]:
         """
         Parse an app's Info.plist for metadata.
-        
+
         Args:
             app_path: Path to .app bundle
-            
+
         Returns:
             Dictionary with CFBundleIdentifier, CFBundleShortVersionString, etc.
         """
@@ -55,10 +55,10 @@ class AppScanner:
     def get_app_info(self, app_path: Path) -> dict[str, Any]:
         """
         Get comprehensive app information.
-        
+
         Args:
             app_path: Path to .app bundle
-            
+
         Returns:
             Dictionary with name, version, identifier, category, size
         """
@@ -68,10 +68,10 @@ class AppScanner:
     def calculate_app_size(self, app_path: Path) -> int:
         """
         Calculate the size of an app bundle.
-        
+
         Args:
             app_path: Path to .app bundle
-            
+
         Returns:
             Size in bytes
         """
@@ -81,10 +81,10 @@ class AppScanner:
     def is_homebrew_cask(self, app_path: Path) -> bool:
         """
         Check if an app was installed via Homebrew cask.
-        
+
         Args:
             app_path: Path to .app bundle
-            
+
         Returns:
             True if installed via Homebrew
         """
@@ -94,10 +94,10 @@ class AppScanner:
     def deduplicate_apps(self, apps: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """
         Remove duplicate app entries (Homebrew cask vs /Applications).
-        
+
         Args:
             apps: List of app dictionaries
-            
+
         Returns:
             Deduplicated list
         """

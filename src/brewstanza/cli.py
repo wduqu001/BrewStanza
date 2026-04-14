@@ -17,7 +17,7 @@ console = Console()
 def main(ctx: click.Context, no_color: bool) -> None:
     """
     🍺 BrewStanza - macOS Homebrew & Application Manager
-    
+
     A minimalist CLI tool for managing Homebrew packages,
     installed applications, and storage analytics.
     """
@@ -30,6 +30,7 @@ def main(ctx: click.Context, no_color: bool) -> None:
 # BREW COMMANDS
 # =============================================================================
 
+
 @main.group()
 @click.pass_context
 def brew(ctx: click.Context) -> None:
@@ -38,14 +39,21 @@ def brew(ctx: click.Context) -> None:
 
 
 @brew.command("list")
-@click.option("--formula", "-f", "formula_only", is_flag=True,
-              help="List only formulae")
-@click.option("--cask", "-c", "cask_only", is_flag=True,
-              help="List only casks")
-@click.option("--size", "-s", is_flag=True, default=True,
-              help="Show package sizes (default: True)")
+@click.option(
+    "--formula", "-f", "formula_only", is_flag=True, help="List only formulae"
+)
+@click.option("--cask", "-c", "cask_only", is_flag=True, help="List only casks")
+@click.option(
+    "--size",
+    "-s",
+    is_flag=True,
+    default=True,
+    help="Show package sizes (default: True)",
+)
 @click.pass_context
-def brew_list(ctx: click.Context, formula_only: bool, cask_only: bool, size: bool) -> None:
+def brew_list(
+    ctx: click.Context, formula_only: bool, cask_only: bool, size: bool
+) -> None:
     """List installed Homebrew packages with sizes."""
     console = ctx.obj["console"]
 
@@ -67,7 +75,9 @@ def brew_info(ctx: click.Context, package: str) -> None:
     console = ctx.obj["console"]
 
     # TODO: Implement in Week 1
-    console.print(f"[yellow]⚠️  Package info for '{package}' not yet implemented[/yellow]")
+    console.print(
+        f"[yellow]⚠️  Package info for '{package}' not yet implemented[/yellow]"
+    )
     console.print("[dim]This feature will be available after Week 1[/dim]")
 
 
@@ -86,6 +96,7 @@ def brew_outdated(ctx: click.Context) -> None:
 # APPS COMMANDS
 # =============================================================================
 
+
 @main.group()
 @click.pass_context
 def apps(ctx: click.Context) -> None:
@@ -94,10 +105,10 @@ def apps(ctx: click.Context) -> None:
 
 
 @apps.command("list")
-@click.option("--category", "-c", is_flag=True,
-              help="Group apps by category")
-@click.option("--size", "-s", is_flag=True, default=True,
-              help="Show app sizes (default: True)")
+@click.option("--category", "-c", is_flag=True, help="Group apps by category")
+@click.option(
+    "--size", "-s", is_flag=True, default=True, help="Show app sizes (default: True)"
+)
 @click.pass_context
 def apps_list(ctx: click.Context, category: bool, size: bool) -> None:
     """List installed applications."""
@@ -127,6 +138,7 @@ def apps_info(ctx: click.Context, app_name: str) -> None:
 # STORAGE COMMANDS
 # =============================================================================
 
+
 @main.command()
 @click.option("--top", "-t", default=10, help="Show top N storage consumers")
 @click.option("--category", "-c", is_flag=True, help="Show only category breakdown")
@@ -148,6 +160,7 @@ def storage(ctx: click.Context, top: int, category: bool) -> None:
 # EXPORT COMMANDS
 # =============================================================================
 
+
 @main.group()
 @click.pass_context
 def export(ctx: click.Context) -> None:
@@ -156,8 +169,13 @@ def export(ctx: click.Context) -> None:
 
 
 @export.command("json")
-@click.option("--output", "-o", type=click.Path(), default=None,
-              help="Output file path (default: ./brewstanza.json)")
+@click.option(
+    "--output",
+    "-o",
+    type=click.Path(),
+    default=None,
+    help="Output file path (default: ./brewstanza.json)",
+)
 @click.pass_context
 def export_json(ctx: click.Context, output: str) -> None:
     """Export configuration to JSON format."""
@@ -169,8 +187,13 @@ def export_json(ctx: click.Context, output: str) -> None:
 
 
 @export.command("markdown")
-@click.option("--output", "-o", type=click.Path(), default=None,
-              help="Output file path (default: ./BREWSTANZA.md)")
+@click.option(
+    "--output",
+    "-o",
+    type=click.Path(),
+    default=None,
+    help="Output file path (default: ./BREWSTANZA.md)",
+)
 @click.pass_context
 def export_markdown(ctx: click.Context, output: str) -> None:
     """Export configuration to Markdown format."""
@@ -182,8 +205,13 @@ def export_markdown(ctx: click.Context, output: str) -> None:
 
 
 @export.command("brewfile")
-@click.option("--output", "-o", type=click.Path(), default=None,
-              help="Output file path (default: ./Brewfile)")
+@click.option(
+    "--output",
+    "-o",
+    type=click.Path(),
+    default=None,
+    help="Output file path (default: ./Brewfile)",
+)
 @click.pass_context
 def export_brewfile(ctx: click.Context, output: str) -> None:
     """Export configuration to Brewfile format."""
@@ -198,8 +226,11 @@ def export_brewfile(ctx: click.Context, output: str) -> None:
 # SYNC COMMANDS
 # =============================================================================
 
+
 @main.command()
-@click.option("--repo", "-r", required=False, help="GitHub repository (format: owner/repo)")
+@click.option(
+    "--repo", "-r", required=False, help="GitHub repository (format: owner/repo)"
+)
 @click.option("--token", "-t", required=False, help="GitHub personal access token")
 @click.option("--message", "-m", default=None, help="Custom commit message")
 @click.pass_context
@@ -218,6 +249,7 @@ def sync(ctx: click.Context, repo: str, token: str, message: str) -> None:
 # =============================================================================
 # AI COMMANDS (Phase 2)
 # =============================================================================
+
 
 @main.group(hidden=True)
 @click.pass_context

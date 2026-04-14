@@ -12,7 +12,9 @@ from brewstanza.scanner.homebrew import HomebrewScanner
 def test_run_brew_command_not_implemented() -> None:
     scanner = HomebrewScanner()
 
-    with pytest.raises(NotImplementedError, match="Homebrew scanner not yet implemented"):
+    with pytest.raises(
+        NotImplementedError, match="Homebrew scanner not yet implemented"
+    ):
         scanner.run_brew_command(["list"])
 
 

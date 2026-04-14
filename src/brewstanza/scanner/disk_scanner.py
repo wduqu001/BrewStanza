@@ -42,23 +42,24 @@ from rich.progress import (
 )
 from rich.table import Table
 
-CONCURRENCY = 8          # max simultaneous `du` subprocesses
-DU_TIMEOUT  = 30.0       # seconds before we give up on a single path
+CONCURRENCY = 8  # max simultaneous `du` subprocesses
+DU_TIMEOUT = 30.0  # seconds before we give up on a single path
 
 
 # ---------------------------------------------------------------------------
 # Data model
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ScanResult:
-    path:       Path
-    size_bytes: int   = 0
-    error:      str   = ""
+    path: Path
+    size_bytes: int = 0
+    error: str = ""
 
     @property
     def size_mb(self) -> float:
-        return self.size_bytes / (1024 ** 2)
+        return self.size_bytes / (1024**2)
 
     @property
     def size_human(self) -> str:
@@ -72,8 +73,8 @@ class ScanResult:
 
 @dataclass
 class ScanSummary:
-    results:       list[ScanResult] = field(default_factory=list)
-    failed_paths:  list[Path]       = field(default_factory=list)
+    results: list[ScanResult] = field(default_factory=list)
+    failed_paths: list[Path] = field(default_factory=list)
 
     @property
     def total_bytes(self) -> int:
@@ -91,6 +92,7 @@ class ScanSummary:
 # Core async primitives
 # ---------------------------------------------------------------------------
 
+
 async def _du(path: Path, semaphore: asyncio.Semaphore) -> ScanResult:
     """
     Run `du -sk <path>` under the semaphore.
@@ -104,9 +106,11 @@ async def _du(path: Path, semaphore: asyncio.Semaphore) -> ScanResult:
     async with semaphore:
         try:
             proc = await asyncio.create_subprocess_exec(
-                "du", "-sk", str(path),
+                "du",
+                "-sk",
+                str(path),
                 stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.DEVNULL,   # suppress "permission denied" noise
+                stderr=asyncio.subprocess.DEVNULL,  # suppress "permission denied" noise
             )
             try:
                 stdout, _ = await asyncio.wait_for(
@@ -136,6 +140,7 @@ async def _du(path: Path, semaphore: asyncio.Semaphore) -> ScanResult:
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
+
 
 async def scan_paths_async(
     paths: list[Path],
@@ -170,7 +175,7 @@ async def scan_paths_async(
         console = Console()
 
     semaphore = asyncio.Semaphore(concurrency)
-    summary   = ScanSummary()
+    summary = ScanSummary()
 
     progress = Progress(
         SpinnerColumn(),
@@ -180,7 +185,7 @@ async def scan_paths_async(
         TaskProgressColumn(),
         TimeElapsedColumn(),
         console=console,
-        transient=True,    # erase the bar when done; final table replaces it
+        transient=True,  # erase the bar when done; final table replaces it
     )
 
     with progress:
@@ -228,6 +233,7 @@ def scan_paths(
 # Convenience: collect common path lists
 # ---------------------------------------------------------------------------
 
+
 def collect_app_paths() -> list[Path]:
     """Return all .app bundles from /Applications and ~/Applications."""
     roots = [
@@ -251,7 +257,10 @@ async def _brew_list_paths() -> list[Path]:
 
     for flag in ("--formula", "--cask"):
         proc = await asyncio.create_subprocess_exec(
-            "brew", "list", flag, "--full-name",
+            "brew",
+            "list",
+            flag,
+            "--full-name",
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.DEVNULL,
         )
@@ -264,7 +273,9 @@ async def _brew_list_paths() -> list[Path]:
         # Ask brew where each package is installed
         if names:
             info_proc = await asyncio.create_subprocess_exec(
-                "brew", "--prefix", *names,
+                "brew",
+                "--prefix",
+                *names,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.DEVNULL,
             )
@@ -287,6 +298,7 @@ def collect_brew_paths() -> list[Path]:
 # Rich display helper
 # ---------------------------------------------------------------------------
 
+
 def render_summary_table(
     summary: ScanSummary,
     *,
@@ -305,14 +317,16 @@ def render_summary_table(
         min_width=60,
     )
     table.add_column("Package / App", style="bold", footer="Total")
-    table.add_column("Size", justify="right", footer=f"[bold]{summary.total_human}[/bold]")
+    table.add_column(
+        "Size", justify="right", footer=f"[bold]{summary.total_human}[/bold]"
+    )
     table.add_column("Share", justify="right", footer="")
 
-    total = summary.total_bytes or 1   # guard division by zero
+    total = summary.total_bytes or 1  # guard division by zero
 
     for result in summary.top(top_n):
         share = result.size_bytes / total * 100
-        bar   = "█" * int(share / 5)   # 20 chars = 100 %
+        bar = "█" * int(share / 5)  # 20 chars = 100 %
         table.add_row(
             result.path.stem,
             result.size_human,

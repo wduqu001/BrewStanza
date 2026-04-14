@@ -14,10 +14,12 @@ class UIRenderer:
     def __init__(self, no_color: bool = False):
         self.console = Console(no_color=no_color)
 
-    def render_package_table(self, packages: list[dict[str, Any]], title: str = "Packages") -> None:
+    def render_package_table(
+        self, packages: list[dict[str, Any]], title: str = "Packages"
+    ) -> None:
         """
         Render a table of packages.
-        
+
         Args:
             packages: List of package dictionaries
             title: Table title
@@ -30,17 +32,17 @@ class UIRenderer:
 
         for pkg in packages:
             table.add_row(
-                pkg.get("name", ""),
-                pkg.get("version", ""),
-                pkg.get("size", "")
+                pkg.get("name", ""), pkg.get("version", ""), pkg.get("size", "")
             )
 
         self.console.print(table)
 
-    def render_app_table(self, apps: list[dict[str, Any]], title: str = "Applications") -> None:
+    def render_app_table(
+        self, apps: list[dict[str, Any]], title: str = "Applications"
+    ) -> None:
         """
         Render a table of applications with categories.
-        
+
         Args:
             apps: List of app dictionaries
             title: Table title
@@ -57,7 +59,7 @@ class UIRenderer:
     def render_storage_breakdown(self, data: dict[str, Any]) -> None:
         """
         Render storage breakdown with visual bars.
-        
+
         Args:
             data: Dictionary with category names and sizes
         """
@@ -67,7 +69,7 @@ class UIRenderer:
     def render_package_detail(self, package: dict[str, Any]) -> None:
         """
         Render detailed view of a single package.
-        
+
         Args:
             package: Package dictionary with all details
         """
@@ -77,7 +79,7 @@ class UIRenderer:
     def render_removal_instructions(self, app: dict[str, Any]) -> None:
         """
         Render removal instructions for an application.
-        
+
         Args:
             app: Application dictionary
         """
