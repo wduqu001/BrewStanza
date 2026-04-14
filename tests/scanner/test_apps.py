@@ -7,7 +7,7 @@ from pathlib import Path
 from brewstanza.scanner.apps import AppScanner
 
 
-def test_scan_directory_returns_list():
+def test_scan_directory_returns_list() -> None:
     scanner = AppScanner()
 
     result = scanner.scan_directory(Path("/Applications"))
@@ -15,7 +15,7 @@ def test_scan_directory_returns_list():
     assert result == []
 
 
-def test_scan_all_applications_returns_list():
+def test_scan_all_applications_returns_list() -> None:
     scanner = AppScanner()
 
     result = scanner.scan_all_applications()
@@ -23,7 +23,7 @@ def test_scan_all_applications_returns_list():
     assert result == []
 
 
-def test_parse_info_plist_returns_dict():
+def test_parse_info_plist_returns_dict() -> None:
     scanner = AppScanner()
 
     result = scanner.parse_info_plist(Path("/Applications/Fake.app"))
@@ -31,7 +31,7 @@ def test_parse_info_plist_returns_dict():
     assert result == {}
 
 
-def test_get_app_info_returns_dict():
+def test_get_app_info_returns_dict() -> None:
     scanner = AppScanner()
 
     result = scanner.get_app_info(Path("/Applications/Fake.app"))
@@ -39,21 +39,21 @@ def test_get_app_info_returns_dict():
     assert result == {}
 
 
-def test_calculate_app_size_returns_zero():
+def test_calculate_app_size_returns_zero() -> None:
     scanner = AppScanner()
 
     result = scanner.calculate_app_size(Path("/Applications/Fake.app"))
     assert result == 0
 
 
-def test_is_homebrew_cask_returns_false():
+def test_is_homebrew_cask_returns_false() -> None:
     scanner = AppScanner()
 
     result = scanner.is_homebrew_cask(Path("/Applications/Fake.app"))
     assert result is False
 
 
-def test_deduplicate_apps_returns_input_when_ok():
+def test_deduplicate_apps_returns_input_when_ok() -> None:
     scanner = AppScanner()
     apps = [
         {"name": "AppA", "path": "/Applications/AppA.app"},

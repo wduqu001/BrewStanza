@@ -3,15 +3,15 @@ Homebrew Scanner Module - Scan and analyze Homebrew packages.
 """
 
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 
 class HomebrewScanner:
     """Scanner for Homebrew packages (formulae and casks)."""
 
-    def __init__(self):
-        self._formulae_cache: Optional[list] = None
-        self._casks_cache: Optional[list] = None
+    def __init__(self) -> None:
+        self._formulae_cache: Optional[list[dict[str, Any]]] = None
+        self._casks_cache: Optional[list[dict[str, Any]]] = None
 
     def run_brew_command(self, args: list[str]) -> str:
         """
@@ -29,7 +29,7 @@ class HomebrewScanner:
         # TODO: Implement in Week 1
         raise NotImplementedError("Homebrew scanner not yet implemented")
 
-    def list_formulae(self) -> list[dict]:
+    def list_formulae(self) -> list[dict[str, Any]]:
         """
         List all installed formulae with metadata.
         
@@ -39,7 +39,7 @@ class HomebrewScanner:
         # TODO: Implement in Week 1
         return []
 
-    def list_casks(self) -> list[dict]:
+    def list_casks(self) -> list[dict[str, Any]]:
         """
         List all installed casks with metadata.
         
@@ -49,7 +49,7 @@ class HomebrewScanner:
         # TODO: Implement in Week 1
         return []
 
-    def get_package_info(self, package: str) -> dict:
+    def get_package_info(self, package: str) -> dict[str, Any]:
         """
         Get detailed information about a package.
         
@@ -62,7 +62,7 @@ class HomebrewScanner:
         # TODO: Implement in Week 1
         return {}
 
-    def get_outdated_packages(self) -> list[dict]:
+    def get_outdated_packages(self) -> list[dict[str, Any]]:
         """
         List outdated packages.
         

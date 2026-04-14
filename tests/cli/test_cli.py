@@ -10,14 +10,14 @@ from brewstanza.cli import main
 class TestCLI:
     """Test CLI commands."""
 
-    def test_version(self):
+    def test_version(self) -> None:
         """Test --version flag."""
         runner = CliRunner()
         result = runner.invoke(main, ["--version"])
         assert result.exit_code == 0
         assert "1.0.0" in result.output
 
-    def test_help(self):
+    def test_help(self) -> None:
         """Test --help flag."""
         runner = CliRunner()
         result = runner.invoke(main, ["--help"])
@@ -26,7 +26,7 @@ class TestCLI:
         assert "brew" in result.output
         assert "apps" in result.output
 
-    def test_brew_help(self):
+    def test_brew_help(self) -> None:
         """Test brew --help."""
         runner = CliRunner()
         result = runner.invoke(main, ["brew", "--help"])
@@ -34,14 +34,14 @@ class TestCLI:
         assert "list" in result.output
         assert "info" in result.output
 
-    def test_apps_help(self):
+    def test_apps_help(self) -> None:
         """Test apps --help."""
         runner = CliRunner()
         result = runner.invoke(main, ["apps", "--help"])
         assert result.exit_code == 0
         assert "list" in result.output
 
-    def test_brew_list_placeholder(self):
+    def test_brew_list_placeholder(self) -> None:
         """Test brew list placeholder message."""
         runner = CliRunner()
         result = runner.invoke(main, ["brew", "list"])

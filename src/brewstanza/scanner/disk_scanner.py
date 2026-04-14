@@ -62,7 +62,7 @@ class ScanResult:
 
     @property
     def size_human(self) -> str:
-        b = self.size_bytes
+        b: float = float(self.size_bytes)
         for unit in ("B", "KB", "MB", "GB", "TB"):
             if b < 1024:
                 return f"{b:.1f} {unit}"

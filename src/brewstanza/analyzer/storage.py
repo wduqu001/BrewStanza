@@ -2,13 +2,31 @@
 Storage Analyzer Module - Calculate and aggregate storage metrics.
 """
 
-from typing import Optional
+from typing import Any, Optional, TypedDict
+
+
+class StorageItem(TypedDict, total=False):
+    """Single storage item entry in a report."""
+
+    name: str
+    size: int
+    type: str
+    percentage: float
+
+
+class StorageReport(TypedDict):
+    """Top-level storage report structure for exporters."""
+
+    homebrew_total: int
+    apps_total: int
+    combined_total: int
+    items: list[StorageItem]
 
 
 class StorageAnalyzer:
     """Analyzer for storage consumption metrics."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._homebrew_total: Optional[int] = None
         self._apps_total: Optional[int] = None
 
@@ -28,7 +46,7 @@ class StorageAnalyzer:
         # Note: this function is a placeholder until actual scanning logic is added.
         return self._homebrew_total or 0
 
-    def calculate_total_app_storage(self, apps: list[dict]) -> int:
+    def calculate_total_app_storage(self, apps: list[dict[str, Any]]) -> int:
         """
         Calculate total storage used by applications.
         
@@ -50,7 +68,7 @@ class StorageAnalyzer:
         self._apps_total = total
         return total
 
-    def get_top_consumers(self, items: list[dict], n: int = 10) -> list[dict]:
+    def get_top_consumers(self, items: list[dict[str, Any]], n: int = 10) -> list[dict[str, Any]]:
         """
         Get top N largest items by size.
         
@@ -100,8 +118,9 @@ class StorageAnalyzer:
         Returns:
             Human-readable string (e.g., "1.5 GB")
         """
+        size: float = float(size_bytes)
         for unit in ["B", "KB", "MB", "GB", "TB"]:
-            if size_bytes < 1024:
-                return f"{size_bytes:.1f} {unit}"
-            size_bytes /= 1024
-        return f"{size_bytes:.1f} PB"
+            if size < 1024:
+                return f"{size:.1f} {unit}"
+            size /= 1024
+        return f"{size:.1f} PB"

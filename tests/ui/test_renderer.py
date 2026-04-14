@@ -7,7 +7,7 @@ from rich.console import Console
 from brewstanza.ui.renderer import UIRenderer
 
 
-def test_render_package_table_includes_package_values():
+def test_render_package_table_includes_package_values() -> None:
     renderer = UIRenderer(no_color=True)
     renderer.console = Console(record=True, no_color=True)
 
@@ -27,7 +27,7 @@ def test_render_package_table_includes_package_values():
     assert "25 MB" in output
 
 
-def test_render_app_table_with_no_rows_prints_header():
+def test_render_app_table_with_no_rows_prints_header() -> None:
     renderer = UIRenderer(no_color=True)
     renderer.console = Console(record=True, no_color=True)
 
@@ -41,7 +41,7 @@ def test_render_app_table_with_no_rows_prints_header():
     assert "Size" in output
 
 
-def test_print_helpers_display_markers():
+def test_print_helpers_display_markers() -> None:
     renderer = UIRenderer(no_color=True)
     renderer.console = Console(record=True, no_color=True)
 

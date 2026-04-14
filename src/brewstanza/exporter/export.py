@@ -12,7 +12,7 @@ class ExportManager:
     """Manages exporting storage reports to JSON, Brewfile, and other formats."""
 
     @staticmethod
-    def to_json(report: StorageReport) -> str:
+    def to_json(report: StorageReport | None) -> str:
         """
         Serialize a StorageReport to JSON format with timestamp.
 

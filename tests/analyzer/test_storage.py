@@ -5,7 +5,7 @@ Tests for BrewStanza storage analyzer.
 from brewstanza.analyzer.storage import StorageAnalyzer
 
 
-def test_format_size_human_readable():
+def test_format_size_human_readable() -> None:
     assert StorageAnalyzer.format_size(0) == "0.0 B"
     assert StorageAnalyzer.format_size(512) == "512.0 B"
     assert StorageAnalyzer.format_size(1024) == "1.0 KB"
@@ -13,7 +13,7 @@ def test_format_size_human_readable():
     assert StorageAnalyzer.format_size(1_073_741_824) == "1.0 GB"
 
 
-def test_get_top_consumers_sorted_by_size_desc():
+def test_get_top_consumers_sorted_by_size_desc() -> None:
     analyzer = StorageAnalyzer()
     data = [
         {"name": "one", "size": 100},
@@ -28,7 +28,7 @@ def test_get_top_consumers_sorted_by_size_desc():
     assert top_two[1]["name"] == "three"
 
 
-def test_get_percentage_distribution_values():
+def test_get_percentage_distribution_values() -> None:
     analyzer = StorageAnalyzer()
     sizes = {"a": 100, "b": 300, "c": 600}
 

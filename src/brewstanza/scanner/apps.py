@@ -3,7 +3,7 @@ Application Scanner Module - Scan and analyze installed macOS applications.
 """
 
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 
 class AppScanner:
@@ -13,8 +13,8 @@ class AppScanner:
     SYSTEM_APPS = Path("/Applications")
     USER_APPS = Path.home() / "Applications"
 
-    def __init__(self):
-        self._apps_cache: Optional[list] = None
+    def __init__(self) -> None:
+        self._apps_cache: Optional[list[dict[str, Any]]] = None
 
     def scan_directory(self, directory: Path) -> list[Path]:
         """
@@ -29,7 +29,7 @@ class AppScanner:
         # TODO: Implement in Week 2
         return []
 
-    def scan_all_applications(self) -> list[dict]:
+    def scan_all_applications(self) -> list[dict[str, Any]]:
         """
         Scan all standard application directories.
         
@@ -39,7 +39,7 @@ class AppScanner:
         # TODO: Implement in Week 2
         return []
 
-    def parse_info_plist(self, app_path: Path) -> dict:
+    def parse_info_plist(self, app_path: Path) -> dict[str, Any]:
         """
         Parse an app's Info.plist for metadata.
         
@@ -52,7 +52,7 @@ class AppScanner:
         # TODO: Implement in Week 2
         return {}
 
-    def get_app_info(self, app_path: Path) -> dict:
+    def get_app_info(self, app_path: Path) -> dict[str, Any]:
         """
         Get comprehensive app information.
         
@@ -91,7 +91,7 @@ class AppScanner:
         # TODO: Implement in Week 2
         return False
 
-    def deduplicate_apps(self, apps: list[dict]) -> list[dict]:
+    def deduplicate_apps(self, apps: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """
         Remove duplicate app entries (Homebrew cask vs /Applications).
         

@@ -2,6 +2,8 @@
 UI Renderer Module - Format and display output using Rich.
 """
 
+from typing import Any
+
 from rich.console import Console
 from rich.table import Table
 
@@ -12,7 +14,7 @@ class UIRenderer:
     def __init__(self, no_color: bool = False):
         self.console = Console(no_color=no_color)
 
-    def render_package_table(self, packages: list[dict], title: str = "Packages") -> None:
+    def render_package_table(self, packages: list[dict[str, Any]], title: str = "Packages") -> None:
         """
         Render a table of packages.
         
@@ -35,7 +37,7 @@ class UIRenderer:
 
         self.console.print(table)
 
-    def render_app_table(self, apps: list[dict], title: str = "Applications") -> None:
+    def render_app_table(self, apps: list[dict[str, Any]], title: str = "Applications") -> None:
         """
         Render a table of applications with categories.
         
@@ -52,7 +54,7 @@ class UIRenderer:
 
         self.console.print(table)
 
-    def render_storage_breakdown(self, data: dict) -> None:
+    def render_storage_breakdown(self, data: dict[str, Any]) -> None:
         """
         Render storage breakdown with visual bars.
         
@@ -62,7 +64,7 @@ class UIRenderer:
         # TODO: Implement in Week 2
         pass
 
-    def render_package_detail(self, package: dict) -> None:
+    def render_package_detail(self, package: dict[str, Any]) -> None:
         """
         Render detailed view of a single package.
         
@@ -72,7 +74,7 @@ class UIRenderer:
         # TODO: Implement in Week 1
         pass
 
-    def render_removal_instructions(self, app: dict) -> None:
+    def render_removal_instructions(self, app: dict[str, Any]) -> None:
         """
         Render removal instructions for an application.
         
