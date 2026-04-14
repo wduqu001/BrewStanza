@@ -10,7 +10,7 @@ readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.11"
 authors = [
-    {name = "Your Name", email = "your.email@example.com"}
+    {name = "Willian Duque"}
 ]
 keywords = ["macos", "homebrew", "cli", "package-manager", "storage"]
 classifiers = [
@@ -38,6 +38,7 @@ dev = [
     "black>=23.0.0",
     "isort>=5.12.0",
     "flake8>=6.0.0",
+    "ruff>=0.6.0",
     "mypy>=1.0.0",
 ]
 github = [
@@ -48,10 +49,10 @@ github = [
 brewstanza = "brewstanza.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/yourusername/brewstanza"
-Documentation = "https://github.com/yourusername/brewstanza#readme"
-Repository = "https://github.com/yourusername/brewstanza.git"
-Issues = "https://github.com/yourusername/brewstanza/issues"
+Homepage = "https://github.com/wduqu001/brewstanza"
+Documentation = "https://github.com/wduqu001/brewstanza#readme"
+Repository = "https://github.com/wduqu001/brewstanza.git"
+Issues = "https://github.com/wduqu001/brewstanza/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -85,8 +86,15 @@ profile = "black"
 line_length = 88
 known_first_party = ["brewstanza"]
 
+[tool.ruff]
+line-length = 120
+lint.select = ["E", "W", "F", "I"]
+lint.ignore = ["W293"]
+target-version = "py311"
+
 [tool.mypy]
 python_version = "3.11"
+strict = true
 warn_return_any = true
 warn_unused_configs = true
 ignore_missing_imports = true
