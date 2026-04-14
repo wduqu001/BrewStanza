@@ -85,8 +85,14 @@ profile = "black"
 line_length = 88
 known_first_party = ["brewstanza"]
 
+[tool.ruff]
+line-length = 100
+select = ["E", "W", "F", "I"]
+target-version = "py311"
+
 [tool.mypy]
 python_version = "3.11"
+strict = true
 warn_return_any = true
 warn_unused_configs = true
 ignore_missing_imports = true
