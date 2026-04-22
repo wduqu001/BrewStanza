@@ -7,14 +7,14 @@
 ## Week 1 — Foundation
 
 ### Project scaffold
-- [ ] `pyproject.toml` with `[project]`, `[project.scripts]`, `[tool.pytest.ini_options]`
-- [ ] `src/brewstanza/` package layout (not flat — required for Homebrew formula)
-- [ ] `tests/` directory mirroring `src/` structure
-- [ ] `ruff` configured in `pyproject.toml` (line length 100, select E/W/F/I)
-- [ ] `mypy` configured in `pyproject.toml` (strict mode)
-- [ ] `.github/workflows/ci.yml` — runs `pytest`, `ruff check`, `mypy` on push + PR
-- [ ] CI badge added to README
-- [ ] `~/.config/brewstanza/config.toml` schema defined and documented
+- [x] `pyproject.toml` with `[project]`, `[project.scripts]`, `[tool.pytest.ini_options]`
+- [x] `src/brewstanza/` package layout (not flat — required for Homebrew formula)
+- [x] `tests/` directory mirroring `src/` structure
+- [x] `ruff` configured in `pyproject.toml` (line length 100, select E/W/F/I)
+- [x] `mypy` configured in `pyproject.toml` (strict mode)
+- [x] `.github/workflows/ci.yml` — runs `pytest`, `ruff check`, `mypy` on push + PR
+- [x] CI badge added to README
+- [x] `~/.config/brewstanza/config.toml` schema defined and documented
 
 ### HomebrewScanner (`scanner/homebrew.py`)
 - [ ] `list_formulae() -> list[str]` — `brew list --formula`
