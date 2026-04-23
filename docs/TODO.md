@@ -17,12 +17,12 @@
 - [x] `~/.config/brewstanza/config.toml` schema defined and documented
 
 ### HomebrewScanner (`scanner/homebrew.py`)
-- [ ] `list_formulae() -> list[str]` — `brew list --formula`
-- [ ] `list_casks() -> list[str]` — `brew list --cask`
-- [ ] `get_info(name: str) -> dict` — `brew info --json=v2`
-- [ ] `get_outdated() -> list[str]` — `brew outdated --quiet`
-- [ ] `get_cellar_path(name: str) -> Path | None` — from info JSON
-- [ ] Unit tests with mocked subprocess (no real `brew` dependency in CI)
+- [x] `list_formulae() -> list[str]` — `brew list --formula`
+- [x] `list_casks() -> list[str]` — `brew list --cask`
+- [x] `get_info(name: str) -> dict` — `brew info --json=v2`
+- [x] `get_outdated() -> list[str]` — `brew outdated --quiet`
+- [x] `get_cellar_path(name: str) -> Path | None` — from info JSON
+- [x] Unit tests with mocked subprocess (no real `brew` dependency in CI)
 
 ### AppScanner (`scanner/apps.py`)
 - [ ] `collect_app_paths() -> list[Path]` — glob `/Applications` and `~/Applications`
