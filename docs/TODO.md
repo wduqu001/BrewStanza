@@ -9,7 +9,7 @@
 ### Project scaffold
 - [x] `pyproject.toml` with `[project]`, `[project.scripts]`, `[tool.pytest.ini_options]`
 - [x] `src/brewstanza/` package layout (not flat — required for Homebrew formula)
-- [x] `tests/` directory mirroring `src/` structure
+- [x] Test files collocated with source files inside `src/brewstanza/`
 - [x] `ruff` configured in `pyproject.toml` (line length 100, select E/W/F/I)
 - [x] `mypy` configured in `pyproject.toml` (strict mode)
 - [x] `.github/workflows/ci.yml` — runs `pytest`, `ruff check`, `mypy` on push + PR

@@ -6,11 +6,10 @@ from a TOML file. The default location for the configuration file is
 `~/.config/brewstanza/config.toml`.
 """
 
-from dataclasses import dataclass, field
-import os
 import tomllib
-from typing import Any, Dict
+from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any, Dict
 
 
 @dataclass

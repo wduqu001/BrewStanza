@@ -23,7 +23,7 @@ class ExportManager:
             JSON string with full inventory snapshot and ISO 8601 timestamp
         """
         # TODO: Implement serialization logic for StorageReport
-        # Should include: homebrew total, apps total, combined total, top-N list, per-item percentage
+        # Includes: homebrew total, apps total, combined total, top-N, percentages
         data = {
             "timestamp": datetime.now().isoformat(),
             "homebrew_total": 0,  # placeholder

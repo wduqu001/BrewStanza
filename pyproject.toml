@@ -58,7 +58,7 @@ Issues = "https://github.com/wduqu001/brewstanza/issues"
 where = ["src"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["src/brewstanza"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
 addopts = "-v --tb=short"
