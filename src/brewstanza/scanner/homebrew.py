@@ -124,7 +124,7 @@ class HomebrewScanner:
         version_raw = f.get("linked_keg") or installed[0].get("version")
         if not version_raw:
             return None
-            
+
         version = str(version_raw)
 
         if self._cellar_base is None:

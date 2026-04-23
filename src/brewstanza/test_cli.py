@@ -2,8 +2,9 @@
 Tests for BrewStanza CLI.
 """
 
+from unittest.mock import MagicMock, patch
+
 from click.testing import CliRunner
-from unittest.mock import patch, MagicMock
 
 from brewstanza.cli import main
 
@@ -49,15 +50,13 @@ class TestCLI:
         instance = mock_scanner.return_value
         instance.get_all_installed_info.return_value = {
             "formulae": [{"name": "python", "installed": [{"version": "3.11"}]}],
-            "casks": []
+            "casks": [],
         }
         instance.get_outdated.return_value = []
         instance._run_brew_command.return_value = "/opt/homebrew/Cellar"
 
         # Mock scan_paths to return an empty summary
-        mock_scan_paths.return_value = MagicMock(results=[
-            MagicMock(size_bytes=1024)
-        ])
+        mock_scan_paths.return_value = MagicMock(results=[MagicMock(size_bytes=1024)])
 
         runner = CliRunner()
         result = runner.invoke(main, ["brew", "list", "--json"])
@@ -71,8 +70,14 @@ class TestCLI:
         """Test brew info."""
         instance = mock_scanner.return_value
         instance.get_info.return_value = {
-            "formulae": [{"name": "wget", "desc": "Internet file retriever", "installed": [{"version": "1.21"}]}],
-            "casks": []
+            "formulae": [
+                {
+                    "name": "wget",
+                    "desc": "Internet file retriever",
+                    "installed": [{"version": "1.21"}],
+                }
+            ],
+            "casks": [],
         }
         instance._run_brew_command.return_value = "/opt/homebrew/Cellar"
 
@@ -89,12 +94,13 @@ class TestCLI:
     def test_apps_list_json(self, mock_scanner, mock_scan_paths) -> None:
         """Test apps list --json."""
         from pathlib import Path
+
         instance = mock_scanner.return_value
         instance.collect_app_paths.return_value = [Path("/Applications/TestApp.app")]
 
-        mock_scan_paths.return_value = MagicMock(results=[
-            MagicMock(path=Path("/Applications/TestApp.app"), size_bytes=4096)
-        ])
+        mock_scan_paths.return_value = MagicMock(
+            results=[MagicMock(path=Path("/Applications/TestApp.app"), size_bytes=4096)]
+        )
 
         runner = CliRunner()
         result = runner.invoke(main, ["apps", "list", "--json"])
@@ -105,6 +111,7 @@ class TestCLI:
     def test_apps_info(self, mock_scanner) -> None:
         """Test apps info."""
         from pathlib import Path
+
         instance = mock_scanner.return_value
         instance.collect_app_paths.return_value = [Path("/Applications/TestApp.app")]
 
@@ -120,10 +127,7 @@ class TestCLI:
     def test_storage_json(self, mock_brew_scanner, mock_app_scanner, mock_scan_paths) -> None:
         """Test storage --json."""
         brew_instance = mock_brew_scanner.return_value
-        brew_instance.get_all_installed_info.return_value = {
-            "formulae": [],
-            "casks": []
-        }
+        brew_instance.get_all_installed_info.return_value = {"formulae": [], "casks": []}
         brew_instance._run_brew_command.return_value = "/opt/homebrew/Cellar"
 
         app_instance = mock_app_scanner.return_value

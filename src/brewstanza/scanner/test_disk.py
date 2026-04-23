@@ -4,7 +4,7 @@ Tests for BrewStanza disk scanner.
 
 import asyncio
 from pathlib import Path
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -65,8 +65,6 @@ def test_du_timeout_path(
         mock_wait_for.side_effect = fake_wait_for
 
         mock_proc = AsyncMock()
-        from unittest.mock import MagicMock
-
         mock_proc.kill = MagicMock()
         mock_create_subprocess_exec.return_value = mock_proc
 
@@ -94,9 +92,6 @@ def test_scan_paths_async(mock_du: AsyncMock) -> None:
         assert summary.results[0].size_bytes == 100
 
     asyncio.run(run_test())
-
-
-
 
 
 @patch("brewstanza.scanner.disk._du")

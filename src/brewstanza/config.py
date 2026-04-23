@@ -22,6 +22,7 @@ class GitHubConfig:
         repository (str): The target repository in the format 'owner/repo'.
         branch (str): The branch to push the snapshots to. Defaults to 'main'.
     """
+
     token: str = ""
     repository: str = ""
     branch: str = "main"
@@ -38,6 +39,7 @@ class ScannerConfig:
         timeout (int): The maximum number of seconds to wait for a single directory
             scan before timing out. Defaults to 30.
     """
+
     concurrency: int = 8
     timeout: int = 30
 
@@ -51,6 +53,7 @@ class Config:
         github (GitHubConfig): Settings related to GitHub synchronization.
         scanner (ScannerConfig): Settings related to the disk scanning behaviour.
     """
+
     github: GitHubConfig = field(default_factory=GitHubConfig)
     scanner: ScannerConfig = field(default_factory=ScannerConfig)
 
@@ -72,15 +75,15 @@ class Config:
         """
         if config_path is None:
             config_path = Path.home() / ".config" / "brewstanza" / "config.toml"
-        
+
         if not config_path.exists():
             return cls()
-        
+
         with config_path.open("rb") as f:
             data = tomllib.load(f)
-        
+
         return cls.from_dict(data)
-    
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "Config":
         """
@@ -94,9 +97,5 @@ class Config:
         """
         github_data = data.get("github", {})
         scanner_data = data.get("scanner", {})
-        
-        return cls(
-            github=GitHubConfig(**github_data),
-            scanner=ScannerConfig(**scanner_data)
-        )
 
+        return cls(github=GitHubConfig(**github_data), scanner=ScannerConfig(**scanner_data))
