@@ -50,23 +50,23 @@
 - [x] Unit tests with fixed `ScanSummary` fixtures
 
 ### CLI commands (`cli.py`)
-- [ ] `brewstanza brew list` — table: name | version | size | outdated flag
-- [ ] `brewstanza brew info <pkg>` — panel: description, version, size, cellar path, uninstall command
-- [ ] `brewstanza apps list` — table: name | path | size
-- [ ] `brewstanza storage` — two-section table (Homebrew / Apps) + top-10 consumer list with inline bars
-- [ ] `--json` flag on all list/storage commands for scriptable output
-- [ ] `--no-color` flag respected globally
+- [x] `brewstanza brew list` — table: name | version | size | outdated flag
+- [x] `brewstanza brew info <pkg>` — panel: description, version, size, cellar path, uninstall command
+- [x] `brewstanza apps list` — table: name | path | size
+- [x] `brewstanza storage` — two-section table (Homebrew / Apps) + top-10 consumer list with inline bars
+- [x] `--json` flag on all list/storage commands for scriptable output
+- [x] `--no-color` flag respected globally
 
 ### UI Renderer (`ui/renderer.py`)
-- [ ] `render_brew_list(packages)` → Rich Table
-- [ ] `render_apps_list(apps)` → Rich Table
-- [ ] `render_storage_report(report)` → Rich layout with panels
-- [ ] `render_summary_table(summary, top_n)` → Rich Table (reused from DiskScanner)
-- [ ] Consistent column widths and colour scheme across all tables
+- [x] `render_brew_list(packages)` → Rich Table
+- [x] `render_apps_list(apps)` → Rich Table
+- [x] `render_storage_report(report)` → Rich layout with panels
+- [x] `render_summary_table(summary, top_n)` → Rich Table (reused from DiskScanner)
+- [x] Consistent column widths and colour scheme across all tables
 
 ### Integration
-- [ ] Run full scan against real machine; verify output is correct and fast (< 5s)
-- [ ] Verify `--json` output is valid JSON and parseable by `jq`
+- [x] Run full scan against real machine; verify output is correct and fast (< 5s)
+- [x] Verify `--json` output is valid JSON and parseable by `jq`
 
 ---
 

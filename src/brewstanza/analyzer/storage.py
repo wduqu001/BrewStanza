@@ -76,3 +76,21 @@ class StorageAnalyzer:
             "combined_total": combined_total,
             "items": top_items,
         }
+
+    @staticmethod
+    def format_size(size_bytes: int) -> str:
+        """
+        Format bytes to human-readable string.
+
+        Args:
+            size_bytes: Size in bytes
+
+        Returns:
+            Human-readable string (e.g., "1.5 GB")
+        """
+        size: float = float(size_bytes)
+        for unit in ["B", "KB", "MB", "GB", "TB"]:
+            if size < 1024:
+                return f"{size:.1f} {unit}"
+            size /= 1024
+        return f"{size:.1f} PB"

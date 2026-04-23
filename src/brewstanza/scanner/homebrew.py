@@ -75,6 +75,16 @@ class HomebrewScanner:
         output = self._run_brew_command(["info", "--json=v2", name])
         return json.loads(output)  # type: ignore
 
+    def get_all_installed_info(self) -> dict[str, Any]:
+        """
+        Get detailed information about all installed packages.
+
+        Returns:
+            Dictionary with parsed JSON info from brew info --json=v2 --installed
+        """
+        output = self._run_brew_command(["info", "--json=v2", "--installed"])
+        return json.loads(output)  # type: ignore
+
     def get_outdated(self) -> list[str]:
         """
         List outdated packages.

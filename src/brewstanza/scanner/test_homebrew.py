@@ -73,6 +73,16 @@ def test_get_info(mock_run: MagicMock, scanner: HomebrewScanner) -> None:
 
 
 @patch("subprocess.run")
+def test_get_all_installed_info(mock_run: MagicMock, scanner: HomebrewScanner) -> None:
+    fake_info = {"formulae": [{"name": "python"}], "casks": []}
+    mock_run.return_value = MagicMock(stdout=json.dumps(fake_info))
+    assert scanner.get_all_installed_info() == fake_info
+    mock_run.assert_called_once_with(
+        ["brew", "info", "--json=v2", "--installed"], check=True, capture_output=True, text=True
+    )
+
+
+@patch("subprocess.run")
 def test_get_outdated(mock_run: MagicMock, scanner: HomebrewScanner) -> None:
     mock_run.return_value = MagicMock(stdout="python\nnode\n")
     assert scanner.get_outdated() == ["python", "node"]
