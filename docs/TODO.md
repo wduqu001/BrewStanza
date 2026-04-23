@@ -45,9 +45,9 @@
 ## Week 2 — Core features
 
 ### StorageAnalyzer (`analyzer/storage.py`)
-- [ ] `aggregate(summary: ScanSummary) -> StorageReport`
-- [ ] `StorageReport` — homebrew total, apps total, combined total, top-N list, per-item percentage
-- [ ] Unit tests with fixed `ScanSummary` fixtures
+- [x] `aggregate(summary: ScanSummary) -> StorageReport`
+- [x] `StorageReport` — homebrew total, apps total, combined total, top-N list, per-item percentage
+- [x] Unit tests with fixed `ScanSummary` fixtures
 
 ### CLI commands (`cli.py`)
 - [ ] `brewstanza brew list` — table: name | version | size | outdated flag

@@ -2,10 +2,12 @@
 Storage Analyzer Module - Calculate and aggregate storage metrics.
 """
 
-from typing import Any, Optional, TypedDict
+from typing import TypedDict
+
+from brewstanza.scanner.disk import ScanSummary
 
 
-class StorageItem(TypedDict, total=False):
+class StorageItem(TypedDict):
     """Single storage item entry in a report."""
 
     name: str
@@ -26,107 +28,51 @@ class StorageReport(TypedDict):
 class StorageAnalyzer:
     """Analyzer for storage consumption metrics."""
 
-    def __init__(self) -> None:
-        self._homebrew_total: Optional[int] = None
-        self._apps_total: Optional[int] = None
-
-    def calculate_total_homebrew_storage(self) -> int:
+    def aggregate(self, summary: ScanSummary, top_n: int = 10) -> StorageReport:
         """
-        Calculate total storage used by Homebrew.
-
-        Includes:
-        - Cellar (formulae)
-        - Caskroom (casks)
-        - Cache
-        - Logs
-
-        Returns:
-            Total size in bytes
-        """
-        # Note: this function is a placeholder until actual scanning logic is added.
-        return self._homebrew_total or 0
-
-    def calculate_total_app_storage(self, apps: list[dict[str, Any]]) -> int:
-        """
-        Calculate total storage used by applications.
+        Aggregate a ScanSummary into a StorageReport.
 
         Args:
-            apps: List of app dictionaries from AppScanner
+            summary: The raw disk scan results.
+            top_n: Number of top consumers to include in the list.
 
         Returns:
-            Total size in bytes
+            A structured StorageReport.
         """
-        total = 0
-        for app in apps:
-            size = app.get("size", 0)
-            if not isinstance(size, int):
-                try:
-                    size = int(size)
-                except (TypeError, ValueError):
-                    size = 0
-            total += size
-        self._apps_total = total
-        return total
+        homebrew_total = 0
+        apps_total = 0
+        items: list[StorageItem] = []
 
-    def get_top_consumers(
-        self, items: list[dict[str, Any]], n: int = 10
-    ) -> list[dict[str, Any]]:
-        """
-        Get top N largest items by size.
+        for result in summary.results:
+            # We determine the type mostly by whether it's an .app bundle
+            if result.path.suffix == ".app":
+                item_type = "app"
+                apps_total += result.size_bytes
+            else:
+                item_type = "homebrew"
+                homebrew_total += result.size_bytes
 
-        Args:
-            items: List of item dictionaries with 'size' key
-            n: Number of top items to return
+            items.append(
+                {
+                    "name": result.path.name,
+                    "size": result.size_bytes,
+                    "type": item_type,
+                    "percentage": 0.0,
+                }
+            )
 
-        Returns:
-            Sorted list of top N items
-        """
-        sorted_items = sorted(
-            items,
-            key=lambda item: (
-                item.get("size", 0)
-                if isinstance(item.get("size", 0), (int, float))
-                else 0
-            ),
-            reverse=True,
-        )
-        return sorted_items[:n]
+        combined_total = homebrew_total + apps_total
 
-    def get_percentage_distribution(self, sizes: dict[str, int]) -> dict[str, float]:
-        """
-        Calculate percentage distribution of sizes.
+        for item in items:
+            if combined_total > 0:
+                item["percentage"] = (item["size"] / combined_total) * 100.0
 
-        Args:
-            sizes: Dictionary mapping names to sizes
-
-        Returns:
-            Dictionary mapping names to percentages (0-100)
-        """
-        total = sum(
-            value for value in sizes.values() if isinstance(value, (int, float))
-        )
-        if total <= 0:
-            return {key: 0.0 for key in sizes}
+        items.sort(key=lambda x: x["size"], reverse=True)
+        top_items = items[:top_n]
 
         return {
-            key: float(value) / total * 100 if isinstance(value, (int, float)) else 0.0
-            for key, value in sizes.items()
+            "homebrew_total": homebrew_total,
+            "apps_total": apps_total,
+            "combined_total": combined_total,
+            "items": top_items,
         }
-
-    @staticmethod
-    def format_size(size_bytes: int) -> str:
-        """
-        Format bytes to human-readable string.
-
-        Args:
-            size_bytes: Size in bytes
-
-        Returns:
-            Human-readable string (e.g., "1.5 GB")
-        """
-        size: float = float(size_bytes)
-        for unit in ["B", "KB", "MB", "GB", "TB"]:
-            if size < 1024:
-                return f"{size:.1f} {unit}"
-            size /= 1024
-        return f"{size:.1f} PB"
