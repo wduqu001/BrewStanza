@@ -25,9 +25,9 @@
 - [x] Unit tests with mocked subprocess (no real `brew` dependency in CI)
 
 ### AppScanner (`scanner/apps.py`)
-- [ ] `collect_app_paths() -> list[Path]` — glob `/Applications` and `~/Applications`
-- [ ] Handles missing directories gracefully (no crash if `~/Applications` doesn't exist)
-- [ ] Unit tests with a temporary fake directory tree
+- [x] `collect_app_paths() -> list[Path]` — glob `/Applications` and `~/Applications`
+- [x] Handles missing directories gracefully (no crash if `~/Applications` doesn't exist)
+- [x] Unit tests with a temporary fake directory tree
 
 ### DiskScanner (`scanner/disk.py`)
 - [ ] `ScanResult` dataclass — `path`, `size_bytes`, `error`, `size_human` property

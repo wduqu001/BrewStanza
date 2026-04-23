@@ -7,58 +7,71 @@ from pathlib import Path
 from brewstanza.scanner.apps import AppScanner
 
 
-def test_scan_directory_returns_list() -> None:
+def test_collect_app_paths_both_exist(tmp_path: Path) -> None:
+    system_apps = tmp_path / "Applications"
+    user_apps = tmp_path / "home" / "Applications"
+
+    system_apps.mkdir(parents=True)
+    user_apps.mkdir(parents=True)
+
+    (system_apps / "Safari.app").mkdir()
+    (system_apps / "Mail.app").mkdir()
+    (system_apps / "NotAnApp.txt").touch()
+
+    (user_apps / "Spotify.app").mkdir()
+
     scanner = AppScanner()
+    scanner.system_apps = system_apps
+    scanner.user_apps = user_apps
 
-    result = scanner.scan_directory(Path("/Applications"))
-    assert isinstance(result, list)
-    assert result == []
+    apps = scanner.collect_app_paths()
+
+    # Order depends on iteration, but let's check set equality
+    expected = {
+        system_apps / "Safari.app",
+        system_apps / "Mail.app",
+        user_apps / "Spotify.app",
+    }
+    assert set(apps) == expected
 
 
-def test_scan_all_applications_returns_list() -> None:
+def test_collect_app_paths_missing_user_dir(tmp_path: Path) -> None:
+    system_apps = tmp_path / "Applications"
+    user_apps = tmp_path / "home" / "Applications"  # Does not exist
+
+    system_apps.mkdir(parents=True)
+    (system_apps / "Safari.app").mkdir()
+
     scanner = AppScanner()
+    scanner.system_apps = system_apps
+    scanner.user_apps = user_apps
 
-    result = scanner.scan_all_applications()
-    assert isinstance(result, list)
-    assert result == []
+    apps = scanner.collect_app_paths()
+    assert apps == [system_apps / "Safari.app"]
 
 
-def test_parse_info_plist_returns_dict() -> None:
+def test_collect_app_paths_missing_both(tmp_path: Path) -> None:
+    system_apps = tmp_path / "Applications"
+    user_apps = tmp_path / "home" / "Applications"
+
     scanner = AppScanner()
+    scanner.system_apps = system_apps
+    scanner.user_apps = user_apps
 
-    result = scanner.parse_info_plist(Path("/Applications/Fake.app"))
-    assert isinstance(result, dict)
-    assert result == {}
+    apps = scanner.collect_app_paths()
+    assert apps == []
 
 
-def test_get_app_info_returns_dict() -> None:
+def test_collect_app_paths_is_file_not_dir(tmp_path: Path) -> None:
+    system_apps = tmp_path / "Applications"
+    user_apps = tmp_path / "home" / "Applications"
+
+    # Create Applications as a file instead of dir
+    system_apps.touch()
+
     scanner = AppScanner()
+    scanner.system_apps = system_apps
+    scanner.user_apps = user_apps
 
-    result = scanner.get_app_info(Path("/Applications/Fake.app"))
-    assert isinstance(result, dict)
-    assert result == {}
-
-
-def test_calculate_app_size_returns_zero() -> None:
-    scanner = AppScanner()
-
-    result = scanner.calculate_app_size(Path("/Applications/Fake.app"))
-    assert result == 0
-
-
-def test_is_homebrew_cask_returns_false() -> None:
-    scanner = AppScanner()
-
-    result = scanner.is_homebrew_cask(Path("/Applications/Fake.app"))
-    assert result is False
-
-
-def test_deduplicate_apps_returns_input_when_ok() -> None:
-    scanner = AppScanner()
-    apps = [
-        {"name": "AppA", "path": "/Applications/AppA.app"},
-        {"name": "AppB", "path": "/Applications/AppB.app"},
-    ]
-
-    result = scanner.deduplicate_apps(apps)
-    assert result == apps
+    apps = scanner.collect_app_paths()
+    assert apps == []
