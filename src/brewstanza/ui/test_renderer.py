@@ -12,8 +12,8 @@ def test_render_package_table_includes_package_values() -> None:
     renderer.console = Console(record=True, no_color=True)
 
     packages = [
-        {"name": "pkgA", "version": "1.2.3", "size": "10 MB"},
-        {"name": "pkgB", "version": "4.5.6", "size": "25 MB"},
+        {"name": "pkgA", "version": "1.2.3", "size": 10485760, "outdated": True},
+        {"name": "pkgB", "version": "4.5.6", "size": 26214400, "outdated": False},
     ]
 
     renderer.render_package_table(packages, title="Test Packages")
@@ -22,9 +22,11 @@ def test_render_package_table_includes_package_values() -> None:
     assert "Test Packages" in output
     assert "pkgA" in output
     assert "1.2.3" in output
-    assert "10 MB" in output
+    assert "10.0 MB" in output
+    assert "⚠️" in output
     assert "pkgB" in output
-    assert "25 MB" in output
+    assert "4.5.6" in output
+    assert "25.0 MB" in output
 
 
 def test_render_app_table_with_no_rows_prints_header() -> None:
@@ -36,8 +38,7 @@ def test_render_app_table_with_no_rows_prints_header() -> None:
 
     assert "Test Apps" in output
     assert "Name" in output
-    assert "Category" in output
-    assert "Version" in output
+    assert "Path" in output
     assert "Size" in output
 
 

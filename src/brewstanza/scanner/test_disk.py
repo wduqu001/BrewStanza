@@ -51,13 +51,19 @@ def test_du_error_path(mock_create_subprocess_exec: AsyncMock) -> None:
     asyncio.run(run_test())
 
 
-@patch("asyncio.wait_for", side_effect=asyncio.TimeoutError)
+@patch("asyncio.wait_for")
 @patch("asyncio.create_subprocess_exec")
 def test_du_timeout_path(
     mock_create_subprocess_exec: AsyncMock,
-    mock_wait_for: AsyncMock,
+    mock_wait_for: MagicMock,
 ) -> None:
     async def run_test() -> None:
+        def fake_wait_for(coro, timeout):
+            coro.close()
+            raise asyncio.TimeoutError()
+
+        mock_wait_for.side_effect = fake_wait_for
+
         mock_proc = AsyncMock()
         from unittest.mock import MagicMock
 
