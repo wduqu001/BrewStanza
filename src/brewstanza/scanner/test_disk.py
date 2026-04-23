@@ -4,6 +4,7 @@ Tests for BrewStanza disk scanner.
 
 import asyncio
 from pathlib import Path
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -58,7 +59,7 @@ def test_du_timeout_path(
     mock_wait_for: MagicMock,
 ) -> None:
     async def run_test() -> None:
-        def fake_wait_for(coro, timeout):
+        def fake_wait_for(coro: Any, timeout: float) -> Any:
             coro.close()
             raise asyncio.TimeoutError()
 

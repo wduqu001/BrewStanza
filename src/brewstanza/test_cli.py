@@ -4,6 +4,8 @@ Tests for BrewStanza CLI.
 
 from unittest.mock import MagicMock, patch
 
+from pathlib import Path
+
 from click.testing import CliRunner
 
 from brewstanza.cli import main
@@ -45,7 +47,9 @@ class TestCLI:
 
     @patch("brewstanza.cli.scan_paths")
     @patch("brewstanza.cli.HomebrewScanner")
-    def test_brew_list_json(self, mock_scanner, mock_scan_paths) -> None:
+    def test_brew_list_json(
+        self, mock_scanner: MagicMock, mock_scan_paths: MagicMock
+    ) -> None:
         """Test brew list --json."""
         instance = mock_scanner.return_value
         instance.get_all_installed_info.return_value = {
@@ -66,7 +70,9 @@ class TestCLI:
 
     @patch("brewstanza.cli.scan_paths")
     @patch("brewstanza.cli.HomebrewScanner")
-    def test_brew_info(self, mock_scanner, mock_scan_paths) -> None:
+    def test_brew_info(
+        self, mock_scanner: MagicMock, mock_scan_paths: MagicMock
+    ) -> None:
         """Test brew info."""
         instance = mock_scanner.return_value
         instance.get_info.return_value = {
@@ -91,10 +97,10 @@ class TestCLI:
 
     @patch("brewstanza.cli.scan_paths")
     @patch("brewstanza.cli.AppScanner")
-    def test_apps_list_json(self, mock_scanner, mock_scan_paths) -> None:
+    def test_apps_list_json(
+        self, mock_scanner: MagicMock, mock_scan_paths: MagicMock
+    ) -> None:
         """Test apps list --json."""
-        from pathlib import Path
-
         instance = mock_scanner.return_value
         instance.collect_app_paths.return_value = [Path("/Applications/TestApp.app")]
 
@@ -108,10 +114,8 @@ class TestCLI:
         assert "TestApp" in result.output
 
     @patch("brewstanza.cli.AppScanner")
-    def test_apps_info(self, mock_scanner) -> None:
+    def test_apps_info(self, mock_scanner: MagicMock) -> None:
         """Test apps info."""
-        from pathlib import Path
-
         instance = mock_scanner.return_value
         instance.collect_app_paths.return_value = [Path("/Applications/TestApp.app")]
 
@@ -124,7 +128,12 @@ class TestCLI:
     @patch("brewstanza.cli.scan_paths")
     @patch("brewstanza.cli.AppScanner")
     @patch("brewstanza.cli.HomebrewScanner")
-    def test_storage_json(self, mock_brew_scanner, mock_app_scanner, mock_scan_paths) -> None:
+    def test_storage_json(
+        self,
+        mock_brew_scanner: MagicMock,
+        mock_app_scanner: MagicMock,
+        mock_scan_paths: MagicMock,
+    ) -> None:
         """Test storage --json."""
         brew_instance = mock_brew_scanner.return_value
         brew_instance.get_all_installed_info.return_value = {"formulae": [], "casks": []}
