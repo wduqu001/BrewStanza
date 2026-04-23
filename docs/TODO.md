@@ -30,15 +30,15 @@
 - [x] Unit tests with a temporary fake directory tree
 
 ### DiskScanner (`scanner/disk.py`)
-- [ ] `ScanResult` dataclass — `path`, `size_bytes`, `error`, `size_human` property
-- [ ] `ScanSummary` dataclass — `results`, `failed_paths`, `total_bytes`, `total_human`, `top(n)`
-- [ ] `_du(path, semaphore) -> ScanResult` — async, never raises, captures timeout
-- [ ] `scan_paths_async(paths, label, concurrency, console) -> ScanSummary`
-- [ ] `scan_paths(paths, ...) -> ScanSummary` — sync wrapper via `asyncio.run()`
-- [ ] Rich progress bar with `transient=True`
-- [ ] Semaphore default of 8, configurable via `config.toml`
-- [ ] Per-path timeout of 30s, configurable via `config.toml`
-- [ ] Unit tests: mock `asyncio.create_subprocess_exec` for happy path, error path, timeout path
+- [x] `ScanResult` dataclass — `path`, `size_bytes`, `error`, `size_human` property
+- [x] `ScanSummary` dataclass — `results`, `failed_paths`, `total_bytes`, `total_human`, `top(n)`
+- [x] `_du(path, semaphore) -> ScanResult` — async, never raises, captures timeout
+- [x] `scan_paths_async(paths, label, concurrency, console) -> ScanSummary`
+- [x] `scan_paths(paths, ...) -> ScanSummary` — sync wrapper via `asyncio.run()`
+- [x] Rich progress bar with `transient=True`
+- [x] Semaphore default of 8, configurable via `config.toml`
+- [x] Per-path timeout of 30s, configurable via `config.toml`
+- [x] Unit tests: mock `asyncio.create_subprocess_exec` for happy path, error path, timeout path
 
 ---
 

@@ -42,8 +42,11 @@ from rich.progress import (
 )
 from rich.table import Table
 
-CONCURRENCY = 8  # max simultaneous `du` subprocesses
-DU_TIMEOUT = 30.0  # seconds before we give up on a single path
+from brewstanza.config import Config
+
+_config = Config.load()
+CONCURRENCY = _config.scanner.concurrency
+DU_TIMEOUT = float(_config.scanner.timeout)
 
 
 # ---------------------------------------------------------------------------
@@ -113,9 +116,7 @@ async def _du(path: Path, semaphore: asyncio.Semaphore) -> ScanResult:
                 stderr=asyncio.subprocess.DEVNULL,  # suppress "permission denied" noise
             )
             try:
-                stdout, _ = await asyncio.wait_for(
-                    proc.communicate(), timeout=DU_TIMEOUT
-                )
+                stdout, _ = await asyncio.wait_for(proc.communicate(), timeout=DU_TIMEOUT)
             except asyncio.TimeoutError:
                 proc.kill()
                 await proc.communicate()
@@ -317,9 +318,7 @@ def render_summary_table(
         min_width=60,
     )
     table.add_column("Package / App", style="bold", footer="Total")
-    table.add_column(
-        "Size", justify="right", footer=f"[bold]{summary.total_human}[/bold]"
-    )
+    table.add_column("Size", justify="right", footer=f"[bold]{summary.total_human}[/bold]")
     table.add_column("Share", justify="right", footer="")
 
     total = summary.total_bytes or 1  # guard division by zero
