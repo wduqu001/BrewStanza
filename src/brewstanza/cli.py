@@ -10,10 +10,25 @@ from rich.console import Console
 
 from brewstanza import __version__
 from brewstanza.analyzer.storage import StorageAnalyzer
+from brewstanza.config import Config
+from brewstanza.exporter.export import ExportManager
+from brewstanza.exporter.github_sync import GitHubSync, GitHubSyncError
 from brewstanza.scanner.apps import AppScanner
 from brewstanza.scanner.disk import scan_paths
 from brewstanza.scanner.homebrew import HomebrewScanner
 from brewstanza.ui.renderer import UIRenderer
+from brewstanza.wizard import needs_wizard, run_wizard
+
+# ---------------------------------------------------------------------------
+# Default output filenames
+# ---------------------------------------------------------------------------
+_DEFAULT_JSON_FILE = "brewstanza-snapshot.json"
+_DEFAULT_BREWFILE = "Brewfile"
+
+
+# ---------------------------------------------------------------------------
+# Root group
+# ---------------------------------------------------------------------------
 
 
 @click.group()
@@ -305,47 +320,173 @@ def storage(ctx: click.Context, top: int, output_json: bool) -> None:
 @main.group()
 @click.pass_context
 def export(ctx: click.Context) -> None:
-    """Export configuration to various formats."""
+    """Export your environment inventory to a file."""
     pass
 
 
 @export.command("json")
-@click.option("--output", "-o", type=click.Path(), default=None)
+@click.option(
+    "--output",
+    "-o",
+    type=click.Path(),
+    default=_DEFAULT_JSON_FILE,
+    show_default=True,
+    help="Destination file path",
+)
+@click.option("--top", "-t", default=10, show_default=True, help="Top N consumers to include")
 @click.pass_context
-def export_json(ctx: click.Context, output: str) -> None:
-    """Export configuration to JSON format."""
-    ctx.obj["console"].print("[yellow]⚠️  JSON export not yet implemented[/yellow]")
+def export_json(ctx: click.Context, output: str, top: int) -> None:
+    """Export a full inventory snapshot to JSON format."""
+    console: Console = ctx.obj["console"]
+    renderer: UIRenderer = ctx.obj["renderer"]
 
+    console.print("[cyan]Collecting inventory…[/cyan]")
 
-@export.command("markdown")
-@click.option("--output", "-o", type=click.Path(), default=None)
-@click.pass_context
-def export_markdown(ctx: click.Context, output: str) -> None:
-    """Export configuration to Markdown format."""
-    ctx.obj["console"].print("[yellow]⚠️  Markdown export not yet implemented[/yellow]")
+    brew_scanner = HomebrewScanner()
+    app_scanner = AppScanner()
+
+    info = brew_scanner.get_all_installed_info()
+    formulae = info.get("formulae", [])
+    casks = info.get("casks", [])
+
+    paths_to_scan: list[Path] = []
+
+    cellar_base = Path(brew_scanner._run_brew_command(["--cellar"])) if formulae else None
+    caskroom_base = (
+        Path(brew_scanner._run_brew_command(["--prefix"])) / "Caskroom" if casks else None
+    )
+    for f in formulae:
+        installed = f.get("installed", [{}])
+        version = installed[0].get("version", "unknown") if installed else "unknown"
+        if cellar_base and installed:
+            paths_to_scan.append(cellar_base / f["name"] / version)
+
+    for c in casks:
+        if caskroom_base:
+            paths_to_scan.append(caskroom_base / c["token"])
+
+    paths_to_scan.extend(app_scanner.collect_app_paths())
+
+    disk_summary = scan_paths(paths_to_scan, label="Scanning disk…", console=console)
+    analyzer = StorageAnalyzer()
+    report = analyzer.aggregate(disk_summary, top_n=top)
+
+    content = ExportManager.to_json(report)
+    dest = Path(output)
+    ExportManager.write_file(content, dest)
+    renderer.print_success(f"Snapshot written to [cyan]{dest.resolve()}[/cyan]")
 
 
 @export.command("brewfile")
-@click.option("--output", "-o", type=click.Path(), default=None)
+@click.option(
+    "--output",
+    "-o",
+    type=click.Path(),
+    default=_DEFAULT_BREWFILE,
+    show_default=True,
+    help="Destination file path",
+)
 @click.pass_context
 def export_brewfile(ctx: click.Context, output: str) -> None:
-    """Export configuration to Brewfile format."""
-    ctx.obj["console"].print("[yellow]⚠️  Brewfile export not yet implemented[/yellow]")
+    """Export installed Homebrew packages to Brewfile format."""
+    console: Console = ctx.obj["console"]
+    renderer: UIRenderer = ctx.obj["renderer"]
+
+    console.print("[cyan]Collecting Homebrew packages…[/cyan]")
+    scanner = HomebrewScanner()
+    info = scanner.get_all_installed_info()
+
+    packages = []
+    for f in info.get("formulae", []):
+        installed = f.get("installed", [{}])
+        version = installed[0].get("version", "unknown") if installed else "unknown"
+        packages.append({"name": f["name"], "version": version, "type": "formula"})
+    for c in info.get("casks", []):
+        packages.append({"name": c["token"], "version": c.get("installed", ""), "type": "cask"})
+
+    content = ExportManager.to_brewfile(packages)
+    dest = Path(output)
+    ExportManager.write_file(content, dest)
+    renderer.print_success(f"Brewfile written to [cyan]{dest.resolve()}[/cyan]")
 
 
 # =============================================================================
-# SYNC COMMANDS
+# SYNC COMMAND
 # =============================================================================
 
 
 @main.command()
-@click.option("--repo", "-r", required=False)
-@click.option("--token", "-t", required=False)
-@click.option("--message", "-m", default=None)
+@click.option("--dry-run", is_flag=True, help="Show what would be committed without pushing")
+@click.option("--top", "-t", default=10, show_default=True, help="Top N consumers in JSON")
 @click.pass_context
-def sync(ctx: click.Context, repo: str, token: str, message: str) -> None:
-    """Sync configuration to GitHub repository."""
-    ctx.obj["console"].print("[yellow]⚠️  GitHub sync not yet implemented[/yellow]")
+def sync(ctx: click.Context, dry_run: bool, top: int) -> None:
+    """Commit a Brewfile + JSON snapshot to your GitHub repository."""
+    console: Console = ctx.obj["console"]
+    renderer: UIRenderer = ctx.obj["renderer"]
+
+    # First-run wizard if config is missing or incomplete
+    if needs_wizard():
+        console.print(
+            "[yellow]⚠[/yellow]  GitHub config is not set up. "
+            "Let's configure it now.\n"
+        )
+        if not run_wizard(console=console):
+            console.print("[red]✗[/red] Setup cancelled. Run [bold]brewstanza sync[/bold] again.")
+            return
+
+    config = Config.load()
+    github_sync = GitHubSync(config)
+
+    console.print("[cyan]Collecting inventory for sync…[/cyan]")
+
+    # --- Build JSON snapshot ---
+    brew_scanner = HomebrewScanner()
+    app_scanner = AppScanner()
+
+    info = brew_scanner.get_all_installed_info()
+    formulae = info.get("formulae", [])
+    casks = info.get("casks", [])
+
+    paths_to_scan: list[Path] = []
+    cellar_base = Path(brew_scanner._run_brew_command(["--cellar"])) if formulae else None
+    caskroom_base = (
+        Path(brew_scanner._run_brew_command(["--prefix"])) / "Caskroom" if casks else None
+    )
+    for f in formulae:
+        installed = f.get("installed", [{}])
+        version = installed[0].get("version", "unknown") if installed else "unknown"
+        if cellar_base and installed:
+            paths_to_scan.append(cellar_base / f["name"] / version)
+    for c in casks:
+        if caskroom_base:
+            paths_to_scan.append(caskroom_base / c["token"])
+    paths_to_scan.extend(app_scanner.collect_app_paths())
+
+    disk_summary = scan_paths(paths_to_scan, label="Scanning disk…", console=console)
+    analyzer = StorageAnalyzer()
+    report = analyzer.aggregate(disk_summary, top_n=top)
+    json_content = ExportManager.to_json(report)
+
+    # --- Build Brewfile ---
+    packages = []
+    for f in formulae:
+        installed = f.get("installed", [{}])
+        version = installed[0].get("version", "unknown") if installed else "unknown"
+        packages.append({"name": f["name"], "version": version, "type": "formula"})
+    for c in casks:
+        packages.append({"name": c["token"], "version": c.get("installed", ""), "type": "cask"})
+    brewfile_content = ExportManager.to_brewfile(packages)
+
+    files = {
+        _DEFAULT_JSON_FILE: json_content,
+        _DEFAULT_BREWFILE: brewfile_content,
+    }
+
+    try:
+        result = github_sync.sync(files, dry_run=dry_run)
+        renderer.print_success(result) if not dry_run else console.print(result)
+    except GitHubSyncError as exc:
+        renderer.print_error(str(exc))
 
 
 # =============================================================================
