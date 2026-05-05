@@ -55,3 +55,56 @@ def test_aggregate_empty_summary() -> None:
     assert report["homebrew_total"] == 0
     assert report["combined_total"] == 0
     assert len(report["items"]) == 0
+
+
+# ---------------------------------------------------------------------------
+# format_size — cover all size units including PB (line 96)
+# ---------------------------------------------------------------------------
+
+
+def test_format_size_bytes() -> None:
+    assert StorageAnalyzer.format_size(512) == "512.0 B"
+
+
+def test_format_size_kb() -> None:
+    assert StorageAnalyzer.format_size(2048) == "2.0 KB"
+
+
+def test_format_size_mb() -> None:
+    assert StorageAnalyzer.format_size(5 * 1024 * 1024) == "5.0 MB"
+
+
+def test_format_size_gb() -> None:
+    assert StorageAnalyzer.format_size(3 * 1024**3) == "3.0 GB"
+
+
+def test_format_size_tb() -> None:
+    assert StorageAnalyzer.format_size(2 * 1024**4) == "2.0 TB"
+
+
+def test_format_size_pb() -> None:
+    """Exercise the PB fallthrough at line 96."""
+    assert "PB" in StorageAnalyzer.format_size(2 * 1024**5)
+
+
+def test_format_size_zero() -> None:
+    assert StorageAnalyzer.format_size(0) == "0.0 B"
+
+
+# ---------------------------------------------------------------------------
+# aggregate — zero combined_total branch (line 67->66)
+# ---------------------------------------------------------------------------
+
+
+def test_aggregate_zero_size_items_have_zero_percentage() -> None:
+    """Items with size_bytes=0 should not raise ZeroDivisionError."""
+    from pathlib import Path
+
+    summary = ScanSummary(
+        results=[ScanResult(path=Path("/opt/homebrew/Cellar/emptypkg"), size_bytes=0)]
+    )
+    analyzer = StorageAnalyzer()
+    report = analyzer.aggregate(summary)
+    # combined_total is 0 — percentage must stay 0.0, not raise
+    assert report["items"][0]["percentage"] == 0.0
+
