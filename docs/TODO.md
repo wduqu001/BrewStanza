@@ -73,29 +73,29 @@
 ## Week 3 — Export, sync, polish
 
 ### ExportManager (`exporter/export.py`)
-- [ ] `to_json(report) -> str` — full inventory snapshot with timestamp
-- [ ] `to_brewfile(packages) -> str` — standard `brew bundle` format
-- [ ] `write_file(content, path: Path)` — with overwrite confirmation prompt
-- [ ] Unit tests for both format serialisers
+- [x] `to_json(report) -> str` — full inventory snapshot with timestamp
+- [x] `to_brewfile(packages) -> str` — standard `brew bundle` format
+- [x] `write_file(content, path: Path)` — with overwrite confirmation prompt
+- [x] Unit tests for both format serialisers
 
 ### GitHub sync
-- [ ] Read PAT and repo from `~/.config/brewstanza/config.toml`
-- [ ] `sync(content, format)` — export → write temp file → `git add` → `git commit` → `git push`
-- [ ] Commit message format: `BrewStanza sync — <ISO 8601 timestamp>`
-- [ ] Graceful error if PAT is missing or expired (link to GitHub token settings)
+- [x] Read PAT and repo from `~/.config/brewstanza/config.toml`
+- [x] `sync(content, format)` — export → write temp file → `git add` → `git commit` → `git push`
+- [x] Commit message format: `BrewStanza sync — <ISO 8601 timestamp>`
+- [x] Graceful error if PAT is missing or expired (link to GitHub token settings)
 
 ### CLI commands
-- [ ] `brewstanza export json` — write `brewstanza-snapshot.json`
-- [ ] `brewstanza export brewfile` — write `Brewfile`
-- [ ] `brewstanza sync` — export + commit in one step
+- [x] `brewstanza export json` — write `brewstanza-snapshot.json`
+- [x] `brewstanza export brewfile` — write `Brewfile`
+- [x] `brewstanza sync` — export + commit in one step
 
 ### First-run experience
-- [ ] Detect missing `config.toml` on any command that needs it
-- [ ] Wizard: prompt for GitHub PAT, repo name, branch; write config file
-- [ ] `brewstanza sync --dry-run` shows what would be committed without pushing
+- [x] Detect missing `config.toml` on any command that needs it
+- [x] Wizard: prompt for GitHub PAT, repo name, branch; write config file
+- [x] `brewstanza sync --dry-run` shows what would be committed without pushing
 
 ### Distribution
-- [ ] `pyproject.toml` entry point: `brewstanza = "brewstanza.cli:main"`
+- [x] `pyproject.toml` entry point: `brewstanza = "brewstanza.cli:main"`
 - [ ] `pip install brewstanza` works from a clean venv
 - [ ] Homebrew tap formula (`Formula/brewstanza.rb`) — installs from PyPI
 - [ ] `brew install <user>/tap/brewstanza` works end-to-end
@@ -104,9 +104,9 @@
 
 ## Quality gates (must pass before calling it done)
 
-- [ ] `pytest --cov=brewstanza --cov-fail-under=80` passes
-- [ ] `ruff check src/ tests/` — zero warnings
-- [ ] `mypy src/` — zero errors
+- [x] `pytest --cov=brewstanza --cov-fail-under=80` passes
+- [x] `ruff check src/ tests/` — zero warnings
+- [x] `mypy src/` — zero errors
 - [ ] CI badge is green on `main`
 - [ ] `brewstanza --help` and all sub-command `--help` are accurate and complete
 
