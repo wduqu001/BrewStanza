@@ -137,14 +137,17 @@ timeout     = 30
 ```text
 brewstanza/
 ├── cli.py
+├── config.py
+├── wizard.py
 ├── scanner/
 │   ├── homebrew.py
 │   ├── apps.py
-│   └── disk_scanner.py
+│   └── disk.py
 ├── analyzer/
 │   └── storage.py
 ├── exporter/
-│   └── export.py
+│   ├── export.py
+│   └── github_sync.py
 └── ui/
     └── renderer.py
 ```
@@ -170,7 +173,7 @@ mypy src/
 
 ## Contributing
 
-Pull requests are welcome. For larger changes, open an issue first so we can align scope and design.
+Pull requests are welcome. For larger changes, open an issue first so we can align scope and design. See [CONTRIBUTING.md](CONTRIBUTING.md) for local development setup.
 
 ## License
 
