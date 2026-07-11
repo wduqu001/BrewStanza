@@ -1,7 +1,10 @@
-import pytest
 from pathlib import Path
+
+import pytest
 from click.testing import CliRunner
+
 from brewstanza.cli import main
+
 
 @pytest.fixture
 def fake_env(tmp_path, mocker):

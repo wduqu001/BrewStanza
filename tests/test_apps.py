@@ -1,6 +1,5 @@
-import pytest
-from pathlib import Path
 from brewstanza.backups.apps import backup
+
 
 def test_backup_success(mocker, tmp_path):
     mocker.patch("brewstanza.backups.apps.sys.platform", "darwin")

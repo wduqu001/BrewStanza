@@ -1,6 +1,5 @@
-import pytest
-from pathlib import Path
 from brewstanza.backups.homebrew import backup
+
 
 def test_backup_success(mocker, tmp_path):
     mocker.patch("brewstanza.backups.homebrew.shutil.which", return_value="/usr/local/bin/brew")

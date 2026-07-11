@@ -1,6 +1,5 @@
-import pytest
-from pathlib import Path
 from brewstanza.backups.zsh import backup
+
 
 def test_backup_success(mocker, tmp_path):
     mock_exists = mocker.patch("brewstanza.backups.zsh.Path.exists")

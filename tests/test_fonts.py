@@ -1,6 +1,5 @@
-import pytest
-from pathlib import Path
 from brewstanza.backups.fonts import backup
+
 
 def test_backup_success(mocker, tmp_path):
     mocker.patch("brewstanza.backups.fonts.sys.platform", "darwin")
