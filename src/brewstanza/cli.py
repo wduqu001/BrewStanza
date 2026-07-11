@@ -57,12 +57,17 @@ def backup(dest: Path, backup_all: bool) -> None:
         else:
             choices = []
             keys = list(MODULES.keys())
+            lower_keys = [k.lower() for k in keys]
             for idx in selection.split(","):
                 idx = idx.strip()
                 if idx.isdigit() and 1 <= int(idx) <= len(keys):
-                    choices.append(keys[int(idx) - 1])
-                elif idx in keys:
-                    choices.append(idx)
+                    choice = keys[int(idx) - 1]
+                    if choice not in choices:
+                        choices.append(choice)
+                elif idx.lower() in lower_keys:
+                    choice = keys[lower_keys.index(idx.lower())]
+                    if choice not in choices:
+                        choices.append(choice)
                     
             if not choices:
                 console.print("[red]Invalid selection. Exiting.[/red]")

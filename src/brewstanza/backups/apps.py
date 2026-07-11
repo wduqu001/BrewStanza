@@ -30,7 +30,7 @@ def backup(backup_dir: Path) -> bool:
     
     dest_file = backup_dir / "apps_list.txt"
     try:
-        with open(dest_file, "w") as f:
+        with open(dest_file, "w", encoding="utf-8") as f:
             for app in apps_found:
                 f.write(f"{app}\n")
         console.print(f"[green]Success:[/green] Backed up list of {len(apps_found)} apps to {dest_file}")  # noqa: E501
