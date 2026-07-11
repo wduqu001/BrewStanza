@@ -1,6 +1,7 @@
-import subprocess
 import shutil
+import subprocess
 from pathlib import Path
+
 from rich.console import Console
 
 console = Console()
@@ -21,7 +22,7 @@ def backup(backup_dir: Path) -> bool:
             text=True
         )
         if result.returncode == 0:
-            console.print(f"[green]Success:[/green] Backed up Homebrew inventory to {brewfile_dest}")
+            console.print(f"[green]Success:[/green] Backed up Homebrew inventory to {brewfile_dest}")  # noqa: E501
             return True
         else:
             console.print(f"[red]Error running brew bundle dump:[/red]\n{result.stderr}")

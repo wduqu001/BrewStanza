@@ -1,9 +1,10 @@
-import click
 from pathlib import Path
+
+import click
 from rich.console import Console
 from rich.panel import Panel
 
-from brewstanza.backups import claude, zsh, homebrew, fonts, git, ssh, apps
+from brewstanza.backups import apps, claude, fonts, git, homebrew, ssh, zsh
 
 console = Console()
 DEFAULT_BACKUP_DIR = Path.home() / "BrewStanza-Backup"
@@ -25,8 +26,8 @@ def main() -> None:
 
 @main.command()
 @click.option(
-    "--dest", 
-    type=click.Path(path_type=Path), 
+    "--dest",
+    type=click.Path(path_type=Path),
     default=DEFAULT_BACKUP_DIR,
     help="Destination directory for backups."
 )
@@ -38,7 +39,7 @@ def main() -> None:
 def backup(dest: Path, backup_all: bool) -> None:
     """Run the backup orchestration menu."""
     dest.mkdir(parents=True, exist_ok=True)
-    console.print(Panel.fit(f"[bold blue]BrewStanza Backup Orchestrator[/bold blue]\nTarget: {dest}", border_style="blue"))
+    console.print(Panel.fit(f"[bold blue]BrewStanza Backup Orchestrator[/bold blue]\nTarget: {dest}", border_style="blue"))  # noqa: E501
     
     if backup_all:
         choices = list(MODULES.keys())
@@ -77,7 +78,7 @@ def backup(dest: Path, backup_all: bool) -> None:
             success_count += 1
         console.print("")
         
-    console.print(f"[bold green]Backup complete! {success_count}/{len(choices)} components processed successfully.[/bold green]")
+    console.print(f"[bold green]Backup complete! {success_count}/{len(choices)} components processed successfully.[/bold green]")  # noqa: E501
 
 if __name__ == "__main__":
     main()

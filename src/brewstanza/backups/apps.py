@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+
 from rich.console import Console
 
 console = Console()
@@ -32,7 +33,7 @@ def backup(backup_dir: Path) -> bool:
         with open(dest_file, "w") as f:
             for app in apps_found:
                 f.write(f"{app}\n")
-        console.print(f"[green]Success:[/green] Backed up list of {len(apps_found)} apps to {dest_file}")
+        console.print(f"[green]Success:[/green] Backed up list of {len(apps_found)} apps to {dest_file}")  # noqa: E501
         return True
     except Exception as e:
         console.print(f"[red]Error writing apps list:[/red] {e}")
