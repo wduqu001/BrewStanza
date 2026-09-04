@@ -108,7 +108,7 @@
 - [x] `ruff check src/ tests/` — zero warnings
 - [x] `mypy src/` — zero errors
 - [ ] CI badge is green on `main`
-- [ ] `brewstanza --help` and all sub-command `--help` are accurate and complete
+- [x] `brewstanza --help` and all sub-command `--help` are accurate and complete
 - [x] CI coverage upload generates the file it uploads (`--cov-report=xml` or remove explicit Codecov file path)
 
 ---
