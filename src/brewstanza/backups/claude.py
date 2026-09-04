@@ -3,6 +3,8 @@ from pathlib import Path
 
 from rich.console import Console
 
+from brewstanza.backups.safety import ensure_safe
+
 console = Console()
 
 def backup(backup_dir: Path) -> bool:
@@ -10,7 +12,13 @@ def backup(backup_dir: Path) -> bool:
     if not source_dir.exists():
         console.print(f"[yellow]Skipped:[/yellow] {source_dir} does not exist.")
         return False
-        
+
+    try:
+        ensure_safe(backup_dir, source_dir)
+    except ValueError as e:
+        console.print(f"[red]Refusing to back up:[/red] {e}")
+        return False
+
     dest_dir = backup_dir / ".claude"
     try:
         if dest_dir.exists():

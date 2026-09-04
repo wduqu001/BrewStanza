@@ -35,3 +35,13 @@ def test_backup_error(mocker, tmp_path):
     result = backup(tmp_path)
     
     assert result is False
+
+def test_backup_refuses_home_destination(mocker, tmp_path):
+    mocker.patch("brewstanza.backups.claude.Path.home", return_value=tmp_path)
+    (tmp_path / ".claude").mkdir()
+    mock_copytree = mocker.patch("brewstanza.backups.claude.shutil.copytree")
+
+    result = backup(tmp_path)
+
+    assert result is False
+    mock_copytree.assert_not_called()

@@ -3,11 +3,11 @@ from brewstanza.backups.apps import backup
 
 def test_backup_success(mocker, tmp_path):
     mocker.patch("brewstanza.backups.apps.sys.platform", "darwin")
-    mock_exists = mocker.patch("brewstanza.backups.apps.Path.exists", return_value=True)
+    mocker.patch("brewstanza.backups.apps.Path.exists", return_value=True)
     
     mock_path_obj = mocker.Mock()
     mock_path_obj.name = "TestApp.app"
-    mock_glob = mocker.patch("brewstanza.backups.apps.Path.glob", return_value=[mock_path_obj])
+    mocker.patch("brewstanza.backups.apps.Path.glob", return_value=[mock_path_obj])
     
     result = backup(tmp_path)
     

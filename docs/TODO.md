@@ -116,9 +116,9 @@
 ## Review remediation
 
 ### Safety and privacy
-- [ ] Reject dangerous backup destinations such as `~`, source config directories, or paths inside source config directories
-- [ ] Resolve paths before comparing backup sources and destinations
-- [ ] Add regression tests for `--dest ~`, `--dest ~/.claude`, and `--dest ~/.zsh`
+- [x] Reject dangerous backup destinations such as `~`, source config directories, or paths inside source config directories
+- [x] Resolve paths before comparing backup sources and destinations
+- [x] Add regression tests for `--dest ~`, `--dest ~/.claude`, and `--dest ~/.zsh`
 - [ ] Replace whole-directory Claude backup with an allowlist of safe config files
 - [ ] Exclude Claude tokens, credentials, history, cache, logs, and local state from backups
 - [ ] Document exactly which Claude paths are copied and which are intentionally excluded
@@ -130,7 +130,7 @@
 - [x] Add a CLI test for `brewstanza --version`
 
 ### Module design and tests
-- [ ] Add a shared backup safety module for protected-path checks, copy policy, and destination validation
+- [x] Add a shared backup safety module for protected-path checks, copy policy, and destination validation
 - [ ] Replace broad `except Exception` blocks with narrower expected filesystem/subprocess exceptions where practical
 - [ ] Return structured backup results so the CLI can distinguish skipped, failed, and succeeded components
 - [ ] Add tests for partial copy failure, missing permissions, and sensitive-file exclusion

@@ -5,6 +5,7 @@ from rich.console import Console
 from rich.panel import Panel
 
 from brewstanza.backups import apps, claude, fonts, git, homebrew, ssh, zsh
+from brewstanza.backups.safety import ensure_dest_not_home
 
 console = Console()
 DEFAULT_BACKUP_DIR = Path.home() / "BrewStanza-Backup"
@@ -39,6 +40,11 @@ def main() -> None:
 )
 def backup(dest: Path, backup_all: bool) -> None:
     """Run the backup orchestration menu."""
+    try:
+        ensure_dest_not_home(dest)
+    except ValueError as e:
+        raise click.ClickException(str(e)) from e
+
     dest.mkdir(parents=True, exist_ok=True)
     console.print(Panel.fit(f"[bold blue]BrewStanza Backup Orchestrator[/bold blue]\nTarget: {dest}", border_style="blue"))  # noqa: E501
     

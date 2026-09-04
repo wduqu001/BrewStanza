@@ -3,6 +3,8 @@ from pathlib import Path
 
 from rich.console import Console
 
+from brewstanza.backups.safety import ensure_safe
+
 console = Console()
 
 def backup(backup_dir: Path) -> bool:
@@ -11,7 +13,13 @@ def backup(backup_dir: Path) -> bool:
     if not gitconfig_file.exists():
         console.print(f"[yellow]Skipped:[/yellow] {gitconfig_file} does not exist.")
         return False
-        
+
+    try:
+        ensure_safe(backup_dir, gitconfig_file)
+    except ValueError as e:
+        console.print(f"[red]Refusing to back up:[/red] {e}")
+        return False
+
     dest_gitconfig_file = backup_dir / ".gitconfig"
     try:
         shutil.copy2(gitconfig_file, dest_gitconfig_file)

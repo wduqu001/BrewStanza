@@ -49,3 +49,15 @@ def test_version_option(runner):
 
     assert result.exit_code == 0
     assert "1.1.0" in result.output
+
+def test_backup_refuses_home_dest(runner, mocker, tmp_path):
+    mocker.patch("brewstanza.backups.safety.Path.home", return_value=tmp_path)
+    mock_modules = {name: mocker.Mock(return_value=True) for name in MODULES.keys()}
+    mocker.patch("brewstanza.cli.MODULES", mock_modules)
+
+    result = runner.invoke(main, ["backup", "--dest", str(tmp_path), "--all"])
+
+    assert result.exit_code == 1
+    assert "Backup destination cannot be the home directory" in result.output
+    for mock_func in mock_modules.values():
+        mock_func.assert_not_called()

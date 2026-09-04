@@ -3,12 +3,20 @@ from pathlib import Path
 
 from rich.console import Console
 
+from brewstanza.backups.safety import ensure_safe
+
 console = Console()
 
 def backup(backup_dir: Path) -> bool:
     zsh_dir = Path.home() / ".zsh"
     zshrc_file = Path.home() / ".zshrc"
-    
+
+    try:
+        ensure_safe(backup_dir, zsh_dir, zshrc_file)
+    except ValueError as e:
+        console.print(f"[red]Refusing to back up:[/red] {e}")
+        return False
+
     success = False
     
     if zsh_dir.exists():

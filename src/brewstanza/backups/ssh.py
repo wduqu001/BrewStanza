@@ -3,6 +3,8 @@ from pathlib import Path
 
 from rich.console import Console
 
+from brewstanza.backups.safety import ensure_safe
+
 console = Console()
 
 def backup(backup_dir: Path) -> bool:
@@ -12,7 +14,13 @@ def backup(backup_dir: Path) -> bool:
     if not config_file.exists():
         console.print(f"[yellow]Skipped:[/yellow] {config_file} does not exist.")
         return False
-        
+
+    try:
+        ensure_safe(backup_dir, config_file)
+    except ValueError as e:
+        console.print(f"[red]Refusing to back up:[/red] {e}")
+        return False
+
     dest_ssh_dir = backup_dir / ".ssh"
     dest_ssh_dir.mkdir(parents=True, exist_ok=True)
     
