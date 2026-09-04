@@ -20,6 +20,7 @@ MODULES = {
 }
 
 @click.group()
+@click.version_option()
 def main() -> None:
     """BrewStanza: Dotfile and App Backup Orchestrator."""
     pass

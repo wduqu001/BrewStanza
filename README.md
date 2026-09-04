@@ -159,9 +159,10 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
-pytest
-ruff check src/ tests/
-mypy src/
+# Run commands through the activated venv's Python.
+python -m pytest
+python -m ruff check src/ tests/
+python -m mypy src/
 ```
 
 ## Roadmap (v2+)

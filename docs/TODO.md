@@ -109,6 +109,31 @@
 - [x] `mypy src/` — zero errors
 - [ ] CI badge is green on `main`
 - [ ] `brewstanza --help` and all sub-command `--help` are accurate and complete
+- [x] CI coverage upload generates the file it uploads (`--cov-report=xml` or remove explicit Codecov file path)
+
+---
+
+## Review remediation
+
+### Safety and privacy
+- [ ] Reject dangerous backup destinations such as `~`, source config directories, or paths inside source config directories
+- [ ] Resolve paths before comparing backup sources and destinations
+- [ ] Add regression tests for `--dest ~`, `--dest ~/.claude`, and `--dest ~/.zsh`
+- [ ] Replace whole-directory Claude backup with an allowlist of safe config files
+- [ ] Exclude Claude tokens, credentials, history, cache, logs, and local state from backups
+- [ ] Document exactly which Claude paths are copied and which are intentionally excluded
+
+### CLI and documentation alignment
+- [ ] Decide whether BrewStanza is currently a backup orchestrator or the v1.1 inventory/export/sync CLI described in README
+- [ ] Update README command examples to match the implemented CLI, or implement the documented `brew`, `apps`, `storage`, `export`, and `sync` commands
+- [x] Add `brewstanza --version` support with Click's version option
+- [x] Add a CLI test for `brewstanza --version`
+
+### Module design and tests
+- [ ] Add a shared backup safety module for protected-path checks, copy policy, and destination validation
+- [ ] Replace broad `except Exception` blocks with narrower expected filesystem/subprocess exceptions where practical
+- [ ] Return structured backup results so the CLI can distinguish skipped, failed, and succeeded components
+- [ ] Add tests for partial copy failure, missing permissions, and sensitive-file exclusion
 
 ---
 

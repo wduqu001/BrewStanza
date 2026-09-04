@@ -43,3 +43,9 @@ def test_backup_invalid_selection(runner, mocker):
     
     assert result.exit_code == 0
     assert "Invalid selection. Exiting." in result.output
+
+def test_version_option(runner):
+    result = runner.invoke(main, ["--version"])
+
+    assert result.exit_code == 0
+    assert "1.1.0" in result.output
