@@ -139,11 +139,11 @@
 
 ## README / portfolio checklist
 
-- [ ] One-line description that leads with the migration workflow story
-- [ ] Install instructions (`brew install` and `pip install` variants)
+- [x] One-line description that leads with the migration workflow story
+- [x] Install instructions (`brew install` and `pip install` variants)
 - [ ] Animated demo GIF showing a full scan → storage → export → sync run
 - [ ] `--demo` flag (or fixture data mode) so reviewers can run it without Homebrew installed
-- [ ] Architecture section with module diagram
-- [ ] Link to PRD and FDD in `docs/`
-- [ ] `CONTRIBUTING.md` with setup instructions and test commands
-- [ ] License file (MIT)
+- [x] Architecture section with module diagram
+- [x] Link to PRD and FDD in `docs/`
+- [x] `CONTRIBUTING.md` with setup instructions and test commands
+- [x] License file (MIT)

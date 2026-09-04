@@ -40,7 +40,7 @@ Removed/deferred in v1.1 (by design):
 - ❌ `apps info <app>` detail flow
 - ⏭️ Auto-categorization of apps (deferred to v2)
 
-See `docs/FDD_v1.1.md` for full design rationale.
+See `docs/PRD_v1.1.md` for the product requirements and `docs/FDD_v1.1.md` for the full design rationale.
 
 ## Installation
 
