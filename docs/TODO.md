@@ -96,7 +96,7 @@
 
 ### Distribution
 - [x] `pyproject.toml` entry point: `brewstanza = "brewstanza.cli:main"`
-- [ ] `pip install brewstanza` works from a clean venv
+- [x] `pip install brewstanza` works from a clean venv
 - [ ] Homebrew tap formula (`Formula/brewstanza.rb`) — installs from PyPI
 - [ ] `brew install <user>/tap/brewstanza` works end-to-end
 
