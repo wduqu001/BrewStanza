@@ -1,55 +1,45 @@
 # BrewStanza
 
-> Reproducible Mac migration for developers — in one CLI.
+> Back up the developer configuration that matters — in one CLI.
 
 [![CI](https://github.com/wduqu001/brewstanza/actions/workflows/ci.yml/badge.svg)](https://github.com/wduqu001/brewstanza/actions/workflows/ci.yml)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![macOS](https://img.shields.io/badge/macOS-Tahoe+-silver.svg)](https://www.apple.com/macos/)
 
-BrewStanza helps you answer a simple question quickly:
-
-**“What exactly is installed on this Mac, and how do I recreate it on another one?”**
-
-It focuses on the essentials:
-
-- Homebrew inventory (formulae + casks)
-- Installed app inventory (`.app` bundles)
-- Storage analytics (what is taking space)
-- Export to JSON/Brewfile for repeatable migration
+BrewStanza creates a portable backup directory for the configuration and
+environment files developers commonly need when moving to another machine.
+It works on macOS and Linux/WSL, skipping macOS-only modules when they are
+not available. It focuses on targeted backups rather than copying an entire
+home directory.
 
 ## Why people use BrewStanza
 
-- **Migrate faster:** move from old Mac to new Mac without guesswork.
-- **Keep environments reproducible:** export snapshots you can version.
-- **Stay lightweight:** no heavy agent, no full-screen UI required.
+- **Migrate faster:** collect important configuration files without guesswork.
+- **Avoid unnecessary exposure:** SSH keys are never copied, while the
+  sensitive-file policy for other configuration directories is being tightened.
+- **Stay lightweight:** no background agent or full-screen UI is required.
 
-## What’s in v1.1
+## Current scope
 
-The v1.1 scope is intentionally focused on migration outcomes:
+The current release provides one command, `brewstanza backup`, with modules for:
 
-- ✅ Async concurrent disk scanning (`du -sk` + semaphore) for faster size analysis
-- ✅ JSON export for automation
-- ✅ Brewfile export for `brew bundle` restore flows
-- ✅ GitHub sync with timestamped commits
+- Claude configuration
+- Zsh configuration
+- Homebrew packages (`Brewfile`)
+- User fonts on macOS
+- Global Git configuration
+- SSH client configuration (never private keys)
+- Installed macOS application names
 
-Removed/deferred in v1.1 (by design):
+The project does not currently provide storage analytics, JSON inventory
+exports, GitHub synchronization, or automated restore. Those are future
+features, not supported commands.
 
-- ❌ `~/Library` leftover scanning
-- ❌ Markdown export
-- ❌ `apps info <app>` detail flow
-- ⏭️ Auto-categorization of apps (deferred to v2)
-
-See `docs/PRD_v1.1.md` for the product requirements and `docs/FDD_v1.1.md` for the full design rationale.
+See [docs/PRD_v1.1.md](docs/PRD_v1.1.md) and
+[docs/FDD_v1.1.md](docs/FDD_v1.1.md) for the current backup design.
 
 ## Installation
-
-### Homebrew (recommended)
-
-```bash
-brew tap yourusername/brewstanza
-brew install brewstanza
-```
 
 ### pip
 
@@ -71,85 +61,55 @@ pip install -e .
 # Check install
 brewstanza --version
 
-# Homebrew inventory
-brewstanza brew list
-brewstanza brew info node@20
-brewstanza brew outdated
+# Back up every supported component
+brewstanza backup --all
 
-# Applications + storage
-brewstanza apps list
-brewstanza storage
+# Back up selected components interactively
+brewstanza backup
 
-# Export migration artifacts
-brewstanza export json
-brewstanza export brewfile
-
-# Sync latest snapshot to GitHub
-brewstanza sync
+# Use a custom destination
+brewstanza backup --dest "$HOME/BrewStanza-Backup"
 ```
 
 ## Command guide
 
 | Area | Command | What it does |
 |---|---|---|
-| Homebrew | `brewstanza brew list` | Lists installed formulae/casks |
-| Homebrew | `brewstanza brew info <pkg>` | Shows package metadata |
-| Homebrew | `brewstanza brew outdated` | Shows outdated packages |
-| Apps | `brewstanza apps list` | Lists installed `.app` bundles |
-| Storage | `brewstanza storage` | Shows aggregate usage + top consumers |
-| Export | `brewstanza export json` | Writes machine-readable inventory |
-| Export | `brewstanza export brewfile` | Writes restore-ready Brewfile |
-| Sync | `brewstanza sync` | Commits snapshot to configured repo |
+| Backup | `brewstanza backup --all` | Runs every available backup module |
+| Backup | `brewstanza backup` | Prompts for individual components |
+| Destination | `brewstanza backup --dest PATH` | Writes backups to a custom directory |
 
 Global flags:
 
 - `--help` shows usage
 - `--version` shows installed version
-- `--no-color` disables ANSI formatting
 
-## Configuration
+## Backup policy
 
-Config file path:
+The default destination is `~/BrewStanza-Backup/`. The CLI rejects the home
+directory as a destination, and modules reject destinations that overlap their
+sources. Review the destination before running a full backup.
 
-- `~/.config/brewstanza/config.toml`
-
-Example:
-
-```toml
-[github]
-token      = "ghp_..."
-repository = "user/dotfiles"
-branch     = "main"
-
-[scanner]
-concurrency = 8
-timeout     = 30
-```
-
-### GitHub sync notes
-
-- Works with private repositories
-- Commit messages include timestamps for easy history tracking
-- If config is missing, first-run setup should guide token/repository entry
+The Claude module copies only `~/.claude/settings.json`; credentials, history,
+caches, logs, and unknown files are excluded. The SSH module copies only
+`~/.ssh/config`; private and public keys are not copied. Each module reports
+when its source is unavailable and skips it rather than failing the whole
+command.
 
 ## Architecture (at a glance)
 
 ```text
 brewstanza/
 ├── cli.py
-├── config.py
-├── wizard.py
-├── scanner/
-│   ├── homebrew.py
-│   ├── apps.py
-│   └── disk.py
-├── analyzer/
-│   └── storage.py
-├── exporter/
-│   ├── export.py
-│   └── github_sync.py
-└── ui/
-    └── renderer.py
+└── backups/
+    ├── apps.py
+    ├── claude.py
+    ├── fonts.py
+    ├── git.py
+    ├── homebrew.py
+    ├── safety.py
+    ├── ssh.py
+    └── zsh.py
 ```
 
 ## Development
@@ -157,19 +117,21 @@ brewstanza/
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -e ".[dev]"
 
-# Run commands through the activated venv's Python.
 python -m pytest
 python -m ruff check src/ tests/
 python -m mypy src/
 ```
 
-## Roadmap (v2+)
+## Roadmap
 
+- Explicit allowlists for sensitive configuration directories
+- Transactional backups that preserve the previous backup on failure
+- Dry-run support
+- Richer application manifest output
+- Automated restore after the backup format is stable
 - App auto-categorization
-- AI config inventory support
-- Dependency tree insights
 - Interactive TUI experience
 
 ## Contributing

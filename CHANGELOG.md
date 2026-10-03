@@ -8,19 +8,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0] - 2026-05-05
 
 ### Added
-- **ExportManager**: Support for exporting inventory snapshots to JSON and Brewfile formats.
-- **GitHub Sync**: Automatic synchronization of inventory snapshots to a GitHub repository with timestamped commits.
-- **Setup Wizard**: Interactive first-run configuration for GitHub integration.
-- **Extended Storage Analytics**: More detailed breakdown and improved concurrency in disk scanning.
-- **Comprehensive Test Suite**: Increased test coverage to 95%.
+- **Backup orchestrator**: Run all or selected configuration backups from one CLI.
+- **Backup modules**: Added Claude, Zsh, Homebrew, Fonts, Git, SSH, and macOS
+  application backup modules.
+- **Destination safety checks**: Reject the home directory globally and reject
+  source-overlapping destinations in filesystem-copy modules.
+- **Comprehensive test suite**: Added unit and integration coverage for the
+  backup modules and CLI.
 
 ### Changed
-- Refactored CLI to use the new `ExportManager` and `GitHubSync` modules.
-- Improved error handling for GitHub authentication and subprocess failures.
-- Updated documentation and added development guidelines.
+- Refactored the project around targeted backup scripts instead of inventory
+  scanning and storage analytics.
+- Added graceful skipping for unavailable macOS-only sources and Homebrew.
+- Updated documentation and development guidelines for the backup workflow.
 
 ### Removed
-- Markdown export (redundant with Rich terminal output).
+- Inventory scanning, storage analytics, JSON export, and GitHub sync commands
+  are not part of the current backup-oriented release.
 
 ## [1.0.0] - 2026-04-14
 

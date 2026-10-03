@@ -28,7 +28,7 @@ src/brewstanza/
 | Module | Responsibility |
 | :--- | :--- |
 | **CLI (cli.py)** | Provides a menu to run all backups or select specific ones. Ensures the `~/BrewStanza-Backup/` directory exists. |
-| **Claude Backup** | Copies `~/.claude` if it exists. |
+| **Claude Backup** | Copies only `~/.claude/settings.json`; other files are excluded. |
 | **Zsh Backup** | Copies `~/.zsh` directory and `~/.zshrc`. |
 | **Homebrew Backup** | Executes `brew bundle dump --file=~/BrewStanza-Backup/Brewfile`. Skips gracefully on WSL if Homebrew is missing. |
 | **Fonts Backup** | Copies `~/Library/Fonts`. Skips on WSL. |
@@ -45,9 +45,13 @@ src/brewstanza/
 
 ## 3. Data Model
 
-All modules expose a standard function signature:
+All modules currently expose a standard function signature:
 ```python
-def backup(backup_dir: Path) -> bool:
-    """Performs the backup and returns True on success or False on skip/error."""
+def backup(backup_dir: Path) -> BackupResult:
+    """Return success, skipped, or failed status with a diagnostic message."""
     pass
 ```
+
+`BackupResult` also records the component name and number of backup artifacts
+created. A directory copy counts as one artifact rather than counting every
+file inside the directory.

@@ -1,12 +1,12 @@
 # BrewStanza — Product Requirements Document
-**Version:** 2.0 (Pivoted to Backup Scripts)
+**Version:** 2.0 (Backup Scripts)
 **Status:** MVP in development
 
 ---
 
 ## 1. Executive Summary
 
-BrewStanza is a modular Python CLI tool that provides developers with an actionable way to backup and restore their critical "dotfiles" and application configurations. It replaces the old disk-scanning approach with targeted backup scripts that gather configurations for tools like Claude, Zsh, Homebrew, SSH, Git, Fonts, and macOS installed applications. 
+BrewStanza is a modular Python CLI tool that provides developers with an actionable way to back up their critical "dotfiles" and application configuration references. It replaces the old disk-scanning approach with targeted backup scripts that gather configurations for tools like Claude, Zsh, Homebrew, SSH, Git, Fonts, and macOS installed applications.
 It supports macOS primarily but gracefully skips macOS-specific tasks on Windows WSL environments.
 
 ---
@@ -19,7 +19,7 @@ It supports macOS primarily but gracefully skips macOS-specific tasks on Windows
 | **Tech stack** | Python 3.11+, Click, Rich |
 | **Target OS** | macOS, Windows WSL |
 | **Distribution** | PyPI |
-| **Repository** | `github.com/<user>/brewstanza` |
+| **Repository** | `github.com/wduqu001/BrewStanza` |
 
 ---
 
@@ -64,7 +64,7 @@ Developers need an easy, actionable way to back up specific configurations and d
 src/brewstanza/
 ├── cli.py               ← CLI menu and orchestrator
 └── backups/
-    ├── claude.py        ← Copies ~/.claude
+    ├── claude.py        ← Copies ~/.claude/settings.json only
     ├── zsh.py           ← Copies ~/.zsh and ~/.zshrc
     ├── homebrew.py      ← Generates Brewfile via brew bundle dump
     ├── fonts.py         ← Copies ~/Library/Fonts

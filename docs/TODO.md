@@ -1,149 +1,48 @@
-# BrewStanza — Development Checklist
+# BrewStanza development checklist
 
-> Work top-to-bottom. Each section unblocks the next.
+The current product is the backup orchestrator described in
+[PRD_v1.1.md](PRD_v1.1.md). Inventory scanning, storage analytics, JSON export,
+GitHub synchronization, and automated restore are future work and are not
+implemented CLI commands.
 
----
+## Current implementation
 
-## Week 1 — Foundation
+- [x] Click CLI with `--version` and `backup` command
+- [x] Interactive component selection and `--all` execution
+- [x] Configurable backup destination
+- [x] Claude, Zsh, Homebrew, Fonts, Git, SSH, and Apps modules
+- [x] Homebrew availability and macOS-only module checks
+- [x] Destination overlap protection
+- [x] Unit and integration tests
+- [x] Ruff and strict mypy checks
 
-### Project scaffold
-- [x] `pyproject.toml` with `[project]`, `[project.scripts]`, `[tool.pytest.ini_options]`
-- [x] `src/brewstanza/` package layout (not flat — required for Homebrew formula)
-- [x] Test files collocated with source files inside `src/brewstanza/`
-- [x] `ruff` configured in `pyproject.toml` (line length 100, select E/W/F/I)
-- [x] `mypy` configured in `pyproject.toml` (strict mode)
-- [x] `.github/workflows/ci.yml` — runs `pytest`, `ruff check`, `mypy` on push + PR
-- [x] CI badge added to README
-- [x] `~/.config/brewstanza/config.toml` schema defined and documented
+## Next implementation phases
 
-### HomebrewScanner (`scanner/homebrew.py`)
-- [x] `list_formulae() -> list[str]` — `brew list --formula`
-- [x] `list_casks() -> list[str]` — `brew list --cask`
-- [x] `get_info(name: str) -> dict` — `brew info --json=v2`
-- [x] `get_outdated() -> list[str]` — `brew outdated --quiet`
-- [x] `get_cellar_path(name: str) -> Path | None` — from info JSON
-- [x] Unit tests with mocked subprocess (no real `brew` dependency in CI)
+### Safety and reliability
 
-### AppScanner (`scanner/apps.py`)
-- [x] `collect_app_paths() -> list[Path]` — glob `/Applications` and `~/Applications`
-- [x] Handles missing directories gracefully (no crash if `~/Applications` doesn't exist)
-- [x] Unit tests with a temporary fake directory tree
+- [x] Replace whole-directory Claude backup with an explicit safe-file allowlist
+- [x] Exclude tokens, credentials, history, caches, logs, and local state
+- [x] Document exactly which files each module copies
+- [x] Return structured success, skipped, and failed results
+- [x] Preserve existing backups when a replacement copy fails
+- [x] Replace broad exception handlers with specific expected exceptions
+- [x] Add Homebrew subprocess timeout and diagnostics
+- [x] Validate destination type, permissions, and symlink resolution
 
-### DiskScanner (`scanner/disk.py`)
-- [x] `ScanResult` dataclass — `path`, `size_bytes`, `error`, `size_human` property
-- [x] `ScanSummary` dataclass — `results`, `failed_paths`, `total_bytes`, `total_human`, `top(n)`
-- [x] `_du(path, semaphore) -> ScanResult` — async, never raises, captures timeout
-- [x] `scan_paths_async(paths, label, concurrency, console) -> ScanSummary`
-- [x] `scan_paths(paths, ...) -> ScanSummary` — sync wrapper via `asyncio.run()`
-- [x] Rich progress bar with `transient=True`
-- [x] Semaphore default of 8, configurable via `config.toml`
-- [x] Per-path timeout of 30s, configurable via `config.toml`
-- [x] Unit tests: mock `asyncio.create_subprocess_exec` for happy path, error path, timeout path
+### Tests and CI
 
----
+- [ ] Test partial copy failures and permission errors
+- [x] Test sensitive-file exclusion
+- [x] Test Homebrew timeout and nonzero exit status
+- [x] Test CLI exit status for failed modules
+- [x] Test supported Python versions in CI
+- [x] Build and smoke-test the installed wheel in CI
+- [x] Test graceful behavior on non-macOS platforms
 
-## Week 2 — Core features
+### Future features
 
-### StorageAnalyzer (`analyzer/storage.py`)
-- [x] `aggregate(summary: ScanSummary) -> StorageReport`
-- [x] `StorageReport` — homebrew total, apps total, combined total, top-N list, per-item percentage
-- [x] Unit tests with fixed `ScanSummary` fixtures
-
-### CLI commands (`cli.py`)
-- [x] `brewstanza brew list` — table: name | version | size | outdated flag
-- [x] `brewstanza brew info <pkg>` — panel: description, version, size, cellar path, uninstall command
-- [x] `brewstanza apps list` — table: name | path | size
-- [x] `brewstanza storage` — two-section table (Homebrew / Apps) + top-10 consumer list with inline bars
-- [x] `--json` flag on all list/storage commands for scriptable output
-- [x] `--no-color` flag respected globally
-
-### UI Renderer (`ui/renderer.py`)
-- [x] `render_brew_list(packages)` → Rich Table
-- [x] `render_apps_list(apps)` → Rich Table
-- [x] `render_storage_report(report)` → Rich layout with panels
-- [x] `render_summary_table(summary, top_n)` → Rich Table (reused from DiskScanner)
-- [x] Consistent column widths and colour scheme across all tables
-
-### Integration
-- [x] Run full scan against real machine; verify output is correct and fast (< 5s)
-- [x] Verify `--json` output is valid JSON and parseable by `jq`
-
----
-
-## Week 3 — Export, sync, polish
-
-### ExportManager (`exporter/export.py`)
-- [x] `to_json(report) -> str` — full inventory snapshot with timestamp
-- [x] `to_brewfile(packages) -> str` — standard `brew bundle` format
-- [x] `write_file(content, path: Path)` — with overwrite confirmation prompt
-- [x] Unit tests for both format serialisers
-
-### GitHub sync
-- [x] Read PAT and repo from `~/.config/brewstanza/config.toml`
-- [x] `sync(content, format)` — export → write temp file → `git add` → `git commit` → `git push`
-- [x] Commit message format: `BrewStanza sync — <ISO 8601 timestamp>`
-- [x] Graceful error if PAT is missing or expired (link to GitHub token settings)
-
-### CLI commands
-- [x] `brewstanza export json` — write `brewstanza-snapshot.json`
-- [x] `brewstanza export brewfile` — write `Brewfile`
-- [x] `brewstanza sync` — export + commit in one step
-
-### First-run experience
-- [x] Detect missing `config.toml` on any command that needs it
-- [x] Wizard: prompt for GitHub PAT, repo name, branch; write config file
-- [x] `brewstanza sync --dry-run` shows what would be committed without pushing
-
-### Distribution
-- [x] `pyproject.toml` entry point: `brewstanza = "brewstanza.cli:main"`
-- [x] `pip install brewstanza` works from a clean venv
-- [ ] Homebrew tap formula (`Formula/brewstanza.rb`) — installs from PyPI
-- [ ] `brew install <user>/tap/brewstanza` works end-to-end
-
----
-
-## Quality gates (must pass before calling it done)
-
-- [x] `pytest --cov=brewstanza --cov-fail-under=80` passes
-- [x] `ruff check src/ tests/` — zero warnings
-- [x] `mypy src/` — zero errors
-- [ ] CI badge is green on `main`
-- [x] `brewstanza --help` and all sub-command `--help` are accurate and complete
-- [x] CI coverage upload generates the file it uploads (`--cov-report=xml` or remove explicit Codecov file path)
-
----
-
-## Review remediation
-
-### Safety and privacy
-- [x] Reject dangerous backup destinations such as `~`, source config directories, or paths inside source config directories
-- [x] Resolve paths before comparing backup sources and destinations
-- [x] Add regression tests for `--dest ~`, `--dest ~/.claude`, and `--dest ~/.zsh`
-- [ ] Replace whole-directory Claude backup with an allowlist of safe config files
-- [ ] Exclude Claude tokens, credentials, history, cache, logs, and local state from backups
-- [ ] Document exactly which Claude paths are copied and which are intentionally excluded
-
-### CLI and documentation alignment
-- [ ] Decide whether BrewStanza is currently a backup orchestrator or the v1.1 inventory/export/sync CLI described in README
-- [ ] Update README command examples to match the implemented CLI, or implement the documented `brew`, `apps`, `storage`, `export`, and `sync` commands
-- [x] Add `brewstanza --version` support with Click's version option
-- [x] Add a CLI test for `brewstanza --version`
-
-### Module design and tests
-- [x] Add a shared backup safety module for protected-path checks, copy policy, and destination validation
-- [ ] Replace broad `except Exception` blocks with narrower expected filesystem/subprocess exceptions where practical
-- [ ] Return structured backup results so the CLI can distinguish skipped, failed, and succeeded components
-- [ ] Add tests for partial copy failure, missing permissions, and sensitive-file exclusion
-
----
-
-## README / portfolio checklist
-
-- [x] One-line description that leads with the migration workflow story
-- [x] Install instructions (`brew install` and `pip install` variants)
-- [ ] Animated demo GIF showing a full scan → storage → export → sync run
-- [ ] `--demo` flag (or fixture data mode) so reviewers can run it without Homebrew installed
-- [x] Architecture section with module diagram
-- [x] Link to PRD and FDD in `docs/`
-- [x] `CONTRIBUTING.md` with setup instructions and test commands
-- [x] License file (MIT)
+- [ ] Add dry-run support
+- [ ] Write a structured application manifest
+- [ ] Define and implement a versioned restore format
+- [ ] Add automated restore only after backup policy is stable
+- [ ] Add app categorization and an interactive TUI
