@@ -1,13 +1,14 @@
-import shutil
 from pathlib import Path
 
 from rich.console import Console
 
+from brewstanza.backups.results import BackupResult
 from brewstanza.backups.safety import ensure_safe
+from brewstanza.backups.transaction import replace_directory, replace_file
 
 console = Console()
 
-def backup(backup_dir: Path) -> bool:
+def backup(backup_dir: Path) -> BackupResult:
     zsh_dir = Path.home() / ".zsh"
     zshrc_file = Path.home() / ".zshrc"
 
@@ -15,32 +16,41 @@ def backup(backup_dir: Path) -> bool:
         ensure_safe(backup_dir, zsh_dir, zshrc_file)
     except ValueError as e:
         console.print(f"[red]Refusing to back up:[/red] {e}")
-        return False
+        return BackupResult.failed("Zsh", str(e))
 
-    success = False
+    artifacts_copied = 0
+    failed = False
     
     if zsh_dir.exists():
         dest_zsh_dir = backup_dir / ".zsh"
         try:
-            if dest_zsh_dir.exists():
-                shutil.rmtree(dest_zsh_dir)
-            shutil.copytree(zsh_dir, dest_zsh_dir, dirs_exist_ok=True)
+            replace_directory(zsh_dir, dest_zsh_dir)
             console.print(f"[green]Success:[/green] Backed up {zsh_dir} to {dest_zsh_dir}")
-            success = True
-        except Exception as e:
+            artifacts_copied += 1
+        except OSError as e:
             console.print(f"[red]Error backing up {zsh_dir}:[/red] {e}")
+            failed = True
     else:
         console.print(f"[yellow]Skipped:[/yellow] {zsh_dir} does not exist.")
 
     if zshrc_file.exists():
         dest_zshrc_file = backup_dir / ".zshrc"
         try:
-            shutil.copy2(zshrc_file, dest_zshrc_file)
+            replace_file(zshrc_file, dest_zshrc_file)
             console.print(f"[green]Success:[/green] Backed up {zshrc_file} to {dest_zshrc_file}")
-            success = True
-        except Exception as e:
+            artifacts_copied += 1
+        except OSError as e:
             console.print(f"[red]Error backing up {zshrc_file}:[/red] {e}")
+            failed = True
     else:
         console.print(f"[yellow]Skipped:[/yellow] {zshrc_file} does not exist.")
         
-    return success
+    if failed:
+        return BackupResult.failed(
+            "Zsh", "One or more Zsh backup artifacts failed.", artifacts_copied
+        )
+    if artifacts_copied:
+        return BackupResult.success(
+            "Zsh", "Backed up available Zsh configuration.", artifacts_copied
+        )
+    return BackupResult.skipped("Zsh", "No Zsh configuration files found.")

@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 
 import click
@@ -5,7 +6,8 @@ from rich.console import Console
 from rich.panel import Panel
 
 from brewstanza.backups import apps, claude, fonts, git, homebrew, ssh, zsh
-from brewstanza.backups.safety import ensure_dest_not_home
+from brewstanza.backups.results import BackupResult
+from brewstanza.backups.safety import ensure_dest_not_home, ensure_safe
 
 console = Console()
 DEFAULT_BACKUP_DIR = Path.home() / "BrewStanza-Backup"
@@ -19,6 +21,26 @@ MODULES = {
     "SSH": ssh.backup,
     "Apps": apps.backup,
 }
+
+def _source_paths_for(name: str) -> tuple[Path, ...]:
+    home = Path.home()
+    sources = {
+        "Claude": (home / ".claude",),
+        "Zsh": (home / ".zsh", home / ".zshrc"),
+        "Fonts": (home / "Library" / "Fonts",),
+        "Git": (home / ".gitconfig",),
+        "SSH": (home / ".ssh" / "config",),
+        "Apps": (Path("/Applications"), home / "Applications"),
+    }
+    return sources.get(name, ())
+
+
+def _validate_dest_for_choices(dest: Path, choices: list[str]) -> None:
+    for name in choices:
+        if name in {"Apps", "Fonts"} and sys.platform != "darwin":
+            continue
+        ensure_safe(dest, *_source_paths_for(name))
+
 
 @click.group()
 @click.version_option()
@@ -45,9 +67,6 @@ def backup(dest: Path, backup_all: bool) -> None:
     except ValueError as e:
         raise click.ClickException(str(e)) from e
 
-    dest.mkdir(parents=True, exist_ok=True)
-    console.print(Panel.fit(f"[bold blue]BrewStanza Backup Orchestrator[/bold blue]\nTarget: {dest}", border_style="blue"))  # noqa: E501
-    
     if backup_all:
         choices = list(MODULES.keys())
     else:
@@ -80,17 +99,31 @@ def backup(dest: Path, backup_all: bool) -> None:
                 console.print("[red]Invalid selection. Exiting.[/red]")
                 return
 
+    try:
+        _validate_dest_for_choices(dest, choices)
+        dest.mkdir(parents=True, exist_ok=True)
+    except (OSError, ValueError) as e:
+        raise click.ClickException(f"Invalid backup destination {dest}: {e}") from e
+
+    console.print(Panel.fit(f"[bold blue]BrewStanza Backup Orchestrator[/bold blue]\nTarget: {dest}", border_style="blue"))  # noqa: E501
     console.print(f"\n[bold]Starting backups for: {', '.join(choices)}[/bold]\n")
     
-    success_count = 0
+    results: list[BackupResult] = []
     for name in choices:
         console.print(f"[bold cyan]--- Backing up {name} ---[/bold cyan]")
         result = MODULES[name](dest)
-        if result:
-            success_count += 1
+        results.append(result)
         console.print("")
-        
-    console.print(f"[bold green]Backup complete! {success_count}/{len(choices)} components processed successfully.[/bold green]")  # noqa: E501
+
+    successes = sum(result.status == "success" for result in results)
+    skipped = sum(result.status == "skipped" for result in results)
+    failed = sum(result.status == "failed" for result in results)
+    console.print(
+        f"[bold green]Backup complete! {successes} succeeded, "
+        f"{skipped} skipped, {failed} failed.[/bold green]"
+    )
+    if failed:
+        raise click.ClickException("One or more backup components failed.")
 
 if __name__ == "__main__":
     main()
