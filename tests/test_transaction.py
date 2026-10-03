@@ -36,6 +36,48 @@ def test_replace_directory_preserves_existing_on_copy_failure(tmp_path, mocker):
     assert (destination / "config").read_text() == "old"
 
 
+def test_replace_directory_cleans_staging_after_partial_copy_failure(tmp_path, mocker):
+    source = tmp_path / "source"
+    destination = tmp_path / "destination"
+    source.mkdir()
+    destination.mkdir()
+    (destination / "config").write_text("old")
+
+    def partial_copy(_source, staging, **_kwargs):
+        Path(staging, "partial").write_text("incomplete")
+        raise PermissionError("Access denied")
+
+    mocker.patch(
+        "brewstanza.backups.transaction.shutil.copytree",
+        side_effect=partial_copy,
+    )
+
+    with pytest.raises(PermissionError, match="Access denied"):
+        replace_directory(source, destination)
+
+    assert (destination / "config").read_text() == "old"
+    assert not (destination / "partial").exists()
+    assert list(tmp_path.glob(".destination.tmp-*")) == []
+    assert list(tmp_path.glob(".destination.old-*")) == []
+
+
+def test_replace_file_propagates_destination_permission_error(tmp_path, mocker):
+    source = tmp_path / "source.txt"
+    destination = tmp_path / "destination.txt"
+    source.write_text("new")
+    destination.write_text("old")
+    mocker.patch(
+        "brewstanza.backups.transaction.os.replace",
+        side_effect=PermissionError("Access denied"),
+    )
+
+    with pytest.raises(PermissionError, match="Access denied"):
+        replace_file(source, destination)
+
+    assert destination.read_text() == "old"
+    assert list(tmp_path.glob(".destination.txt.tmp-*")) == []
+
+
 def test_replace_directory_preserves_source_symlinks(tmp_path):
     source = tmp_path / "source"
     destination = tmp_path / "destination"

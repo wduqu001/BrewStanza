@@ -31,7 +31,7 @@ implemented CLI commands.
 
 ### Tests and CI
 
-- [ ] Test partial copy failures and permission errors
+- [x] Test partial copy failures and permission errors
 - [x] Test sensitive-file exclusion
 - [x] Test Homebrew timeout and nonzero exit status
 - [x] Test CLI exit status for failed modules
