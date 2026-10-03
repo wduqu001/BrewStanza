@@ -56,3 +56,47 @@ def replace_text(content: str, destination: Path) -> None:
         os.replace(temporary_path, destination)
     finally:
         temporary_path.unlink(missing_ok=True)
+
+
+def replace_texts(contents: dict[Path, str]) -> None:
+    """Replace several text files together, restoring prior files on failure."""
+    temporary_paths: dict[Path, Path] = {}
+    previous_paths: dict[Path, Path] = {}
+    committed: list[Path] = []
+    try:
+        for destination, content in contents.items():
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            fd, temporary = tempfile.mkstemp(
+                prefix=f".{destination.name}.tmp-", dir=destination.parent
+            )
+            os.close(fd)
+            temporary_path = Path(temporary)
+            temporary_path.write_text(content, encoding="utf-8")
+            temporary_paths[destination] = temporary_path
+
+        for destination in contents:
+            if os.path.lexists(destination):
+                fd, previous = tempfile.mkstemp(
+                    prefix=f".{destination.name}.old-", dir=destination.parent
+                )
+                os.close(fd)
+                previous_path = Path(previous)
+                previous_path.unlink()
+                os.replace(destination, previous_path)
+                previous_paths[destination] = previous_path
+
+        for destination, temporary_path in temporary_paths.items():
+            os.replace(temporary_path, destination)
+            committed.append(destination)
+    except BaseException:
+        for destination in committed:
+            destination.unlink(missing_ok=True)
+        for destination, previous_path in previous_paths.items():
+            if os.path.lexists(previous_path):
+                os.replace(previous_path, destination)
+        raise
+    finally:
+        for temporary_path in temporary_paths.values():
+            temporary_path.unlink(missing_ok=True)
+        for previous_path in previous_paths.values():
+            previous_path.unlink(missing_ok=True)

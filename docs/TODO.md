@@ -42,7 +42,7 @@ implemented CLI commands.
 ### Future features
 
 - [ ] Add dry-run support
-- [ ] Write a structured application manifest
+- [x] Write a structured application manifest
 - [ ] Define and implement a versioned restore format
 - [ ] Add automated restore only after backup policy is stable
 - [ ] Add app categorization and an interactive TUI

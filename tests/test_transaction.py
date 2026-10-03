@@ -1,8 +1,9 @@
+import os
 from pathlib import Path
 
 import pytest
 
-from brewstanza.backups.transaction import replace_directory, replace_file
+from brewstanza.backups.transaction import replace_directory, replace_file, replace_texts
 
 
 def test_replace_file_preserves_existing_on_copy_failure(tmp_path, mocker):
@@ -76,6 +77,61 @@ def test_replace_file_propagates_destination_permission_error(tmp_path, mocker):
 
     assert destination.read_text() == "old"
     assert list(tmp_path.glob(".destination.txt.tmp-*")) == []
+
+
+def test_replace_texts_restores_all_files_when_second_replace_fails(tmp_path, mocker):
+    first = tmp_path / "first.txt"
+    second = tmp_path / "second.txt"
+    first.write_text("old first")
+    second.write_text("old second")
+    real_replace = os.replace
+    calls = 0
+
+    def fail_on_second_commit(source, destination, **kwargs):
+        nonlocal calls
+        calls += 1
+        if calls == 4:
+            raise PermissionError("Access denied")
+        return real_replace(source, destination, **kwargs)
+
+    mocker.patch(
+        "brewstanza.backups.transaction.os.replace",
+        side_effect=fail_on_second_commit,
+    )
+
+    with pytest.raises(PermissionError, match="Access denied"):
+        replace_texts({first: "new first", second: "new second"})
+
+    assert first.read_text() == "old first"
+    assert second.read_text() == "old second"
+
+
+def test_replace_texts_restores_dangling_symlink_on_failure(tmp_path, mocker):
+    first = tmp_path / "first.txt"
+    second = tmp_path / "second.txt"
+    first.write_text("old first")
+    second.symlink_to(tmp_path / "missing-target")
+    real_replace = os.replace
+    calls = 0
+
+    def fail_on_second_commit(source, destination, **kwargs):
+        nonlocal calls
+        calls += 1
+        if calls == 4:
+            raise PermissionError("Access denied")
+        return real_replace(source, destination, **kwargs)
+
+    mocker.patch(
+        "brewstanza.backups.transaction.os.replace",
+        side_effect=fail_on_second_commit,
+    )
+
+    with pytest.raises(PermissionError, match="Access denied"):
+        replace_texts({first: "new first", second: "new second"})
+
+    assert first.read_text() == "old first"
+    assert second.is_symlink()
+    assert second.readlink() == tmp_path / "missing-target"
 
 
 def test_replace_directory_preserves_source_symlinks(tmp_path):

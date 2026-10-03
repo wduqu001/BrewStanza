@@ -1,3 +1,5 @@
+import json
+
 from brewstanza.backups.apps import backup
 
 
@@ -15,6 +17,9 @@ def test_backup_success(mocker, tmp_path):
     assert (tmp_path / "apps_list.txt").exists()
     with open(tmp_path / "apps_list.txt", "r") as f:
         assert "TestApp.app" in f.read()
+    manifest = json.loads((tmp_path / "apps_manifest.json").read_text())
+    assert manifest["schema_version"] == 1
+    assert manifest["applications"][0]["name"] == "TestApp.app"
 
 def test_backup_skipped_on_linux(mocker, tmp_path):
     mocker.patch("brewstanza.backups.apps.sys.platform", "linux")
@@ -46,7 +51,7 @@ def test_backup_preserves_existing_app_list_on_write_failure(mocker, tmp_path):
     existing = tmp_path / "apps_list.txt"
     existing.write_text("old\n")
     mocker.patch(
-        "brewstanza.backups.apps.replace_text",
+        "brewstanza.backups.apps.replace_texts",
         side_effect=PermissionError("Access denied"),
     )
 
