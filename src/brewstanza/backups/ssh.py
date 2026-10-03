@@ -8,7 +8,7 @@ from brewstanza.backups.transaction import replace_file
 
 console = Console()
 
-def backup(backup_dir: Path) -> BackupResult:
+def backup(backup_dir: Path, *, dry_run: bool = False) -> BackupResult:
     ssh_dir = Path.home() / ".ssh"
     config_file = ssh_dir / "config"
     
@@ -22,10 +22,14 @@ def backup(backup_dir: Path) -> BackupResult:
         console.print(f"[red]Refusing to back up:[/red] {e}")
         return BackupResult.failed("SSH", str(e))
 
+    dest_config_file = backup_dir / ".ssh" / "config"
+    if dry_run:
+        console.print(f"[cyan]Would back up:[/cyan] {config_file} to {dest_config_file}")
+        return BackupResult.success("SSH", f"Would back up {config_file}.", 1)
+
     try:
         dest_ssh_dir = backup_dir / ".ssh"
         dest_ssh_dir.mkdir(parents=True, exist_ok=True)
-        dest_config_file = dest_ssh_dir / "config"
         replace_file(config_file, dest_config_file)
         console.print(f"[green]Success:[/green] Backed up {config_file} to {dest_config_file}")
         return BackupResult.success("SSH", f"Backed up {config_file} to {dest_config_file}.", 1)

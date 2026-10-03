@@ -9,7 +9,7 @@ from brewstanza.backups.transaction import replace_directory
 
 console = Console()
 
-def backup(backup_dir: Path) -> BackupResult:
+def backup(backup_dir: Path, *, dry_run: bool = False) -> BackupResult:
     if sys.platform != "darwin":
         console.print("[yellow]Skipped:[/yellow] Fonts backup is only supported on macOS.")
         return BackupResult.skipped("Fonts", "Font backup is only supported on macOS.")
@@ -26,6 +26,10 @@ def backup(backup_dir: Path) -> BackupResult:
         return BackupResult.failed("Fonts", str(e))
 
     dest_dir = backup_dir / "Fonts"
+    if dry_run:
+        console.print(f"[cyan]Would back up:[/cyan] {source_dir} to {dest_dir}")
+        return BackupResult.success("Fonts", f"Would back up {source_dir}.", 1)
+
     try:
         replace_directory(source_dir, dest_dir)
         console.print(f"[green]Success:[/green] Backed up {source_dir} to {dest_dir}")

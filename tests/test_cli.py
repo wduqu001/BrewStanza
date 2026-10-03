@@ -25,6 +25,26 @@ def test_backup_all(runner, mocker):
     for mock_func in mock_modules.values():
         mock_func.assert_called_once()
 
+
+def test_backup_dry_run_does_not_create_destination(runner, mocker, tmp_path):
+    destination = tmp_path / "planned-backup"
+    mock_modules = {
+        name: mocker.Mock(return_value=BackupResult.success(name, "planned"))
+        for name in MODULES.keys()
+    }
+    mocker.patch("brewstanza.cli.MODULES", mock_modules)
+
+    result = runner.invoke(
+        main, ["backup", "--all", "--dry-run", "--dest", str(destination)]
+    )
+
+    assert result.exit_code == 0
+    assert "Dry run Orchestrator" in result.output
+    assert not destination.exists()
+    for mock_func in mock_modules.values():
+        mock_func.assert_called_once_with(destination, dry_run=True)
+
+
 def test_backup_prompt_selection(runner, mocker):
     mock_modules = {
         name: mocker.Mock(return_value=BackupResult.success(name, "ok"))

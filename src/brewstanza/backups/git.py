@@ -8,7 +8,7 @@ from brewstanza.backups.transaction import replace_file
 
 console = Console()
 
-def backup(backup_dir: Path) -> BackupResult:
+def backup(backup_dir: Path, *, dry_run: bool = False) -> BackupResult:
     gitconfig_file = Path.home() / ".gitconfig"
     
     if not gitconfig_file.exists():
@@ -22,6 +22,12 @@ def backup(backup_dir: Path) -> BackupResult:
         return BackupResult.failed("Git", str(e))
 
     dest_gitconfig_file = backup_dir / ".gitconfig"
+    if dry_run:
+        console.print(
+            f"[cyan]Would back up:[/cyan] {gitconfig_file} to {dest_gitconfig_file}"
+        )
+        return BackupResult.success("Git", f"Would back up {gitconfig_file}.", 1)
+
     try:
         replace_file(gitconfig_file, dest_gitconfig_file)
         console.print(f"[green]Success:[/green] Backed up {gitconfig_file} to {dest_gitconfig_file}")  # noqa: E501

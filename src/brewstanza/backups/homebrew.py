@@ -10,13 +10,19 @@ from brewstanza.backups.results import BackupResult
 
 console = Console()
 
-def backup(backup_dir: Path) -> BackupResult:
+def backup(backup_dir: Path, *, dry_run: bool = False) -> BackupResult:
     if shutil.which("brew") is None:
         console.print("[yellow]Skipped:[/yellow] 'brew' command not found in PATH.")
         return BackupResult.skipped("Homebrew", "'brew' command not found in PATH.")
         
     brewfile_dest = backup_dir / "Brewfile"
     temporary_path: Path | None = None
+
+    if dry_run:
+        console.print(f"[cyan]Would run:[/cyan] brew bundle dump to {brewfile_dest}")
+        return BackupResult.success(
+            "Homebrew", f"Would back up Homebrew inventory to {brewfile_dest}.", 1
+        )
     
     console.print(f"[cyan]Running:[/cyan] brew bundle dump to {brewfile_dest}...")
     try:

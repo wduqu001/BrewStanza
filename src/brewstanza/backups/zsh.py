@@ -8,7 +8,7 @@ from brewstanza.backups.transaction import replace_directory, replace_file
 
 console = Console()
 
-def backup(backup_dir: Path) -> BackupResult:
+def backup(backup_dir: Path, *, dry_run: bool = False) -> BackupResult:
     zsh_dir = Path.home() / ".zsh"
     zshrc_file = Path.home() / ".zshrc"
 
@@ -20,6 +20,24 @@ def backup(backup_dir: Path) -> BackupResult:
 
     artifacts_copied = 0
     failed = False
+
+    if dry_run:
+        planned = 0
+        if zsh_dir.exists():
+            console.print(f"[cyan]Would back up:[/cyan] {zsh_dir} to {backup_dir / '.zsh'}")
+            planned += 1
+        else:
+            console.print(f"[yellow]Skipped:[/yellow] {zsh_dir} does not exist.")
+        if zshrc_file.exists():
+            console.print(f"[cyan]Would back up:[/cyan] {zshrc_file} to {backup_dir / '.zshrc'}")
+            planned += 1
+        else:
+            console.print(f"[yellow]Skipped:[/yellow] {zshrc_file} does not exist.")
+        if planned:
+            return BackupResult.success(
+                "Zsh", "Would back up available Zsh configuration.", planned
+            )
+        return BackupResult.skipped("Zsh", "No Zsh configuration files found.")
     
     if zsh_dir.exists():
         dest_zsh_dir = backup_dir / ".zsh"

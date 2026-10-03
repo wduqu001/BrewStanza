@@ -75,7 +75,7 @@ def _create_temp_file(directory_descriptor: int) -> tuple[int, str]:
     raise FileExistsError("Unable to create a unique temporary backup file")
 
 
-def backup(backup_dir: Path) -> BackupResult:
+def backup(backup_dir: Path, *, dry_run: bool = False) -> BackupResult:
     source_dir = Path.home() / ".claude"
     source_file = source_dir / ALLOWED_FILES[0]
     if not source_file.is_file():
@@ -91,6 +91,10 @@ def backup(backup_dir: Path) -> BackupResult:
         return BackupResult.failed("Claude", str(e))
 
     dest_file = backup_dir / ".claude" / ALLOWED_FILES[0]
+    if dry_run:
+        console.print(f"[cyan]Would back up:[/cyan] {source_file} to {dest_file}")
+        return BackupResult.success("Claude", f"Would back up {source_file}.", 1)
+
     try:
         content = _read_settings(source_dir)
         destination_descriptor = _open_directory(backup_dir, create=True)

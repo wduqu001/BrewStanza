@@ -60,7 +60,12 @@ def main() -> None:
     is_flag=True,
     help="Run all backup modules without prompting."
 )
-def backup(dest: Path, backup_all: bool) -> None:
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Show planned backups without writing files or running backup commands."
+)
+def backup(dest: Path, backup_all: bool, dry_run: bool) -> None:
     """Run the backup orchestration menu."""
     try:
         ensure_dest_not_home(dest)
@@ -101,17 +106,19 @@ def backup(dest: Path, backup_all: bool) -> None:
 
     try:
         _validate_dest_for_choices(dest, choices)
-        dest.mkdir(parents=True, exist_ok=True)
+        if not dry_run:
+            dest.mkdir(parents=True, exist_ok=True)
     except (OSError, ValueError) as e:
         raise click.ClickException(f"Invalid backup destination {dest}: {e}") from e
 
-    console.print(Panel.fit(f"[bold blue]BrewStanza Backup Orchestrator[/bold blue]\nTarget: {dest}", border_style="blue"))  # noqa: E501
+    mode = "Dry run" if dry_run else "Backup"
+    console.print(Panel.fit(f"[bold blue]BrewStanza {mode} Orchestrator[/bold blue]\nTarget: {dest}", border_style="blue"))  # noqa: E501
     console.print(f"\n[bold]Starting backups for: {', '.join(choices)}[/bold]\n")
     
     results: list[BackupResult] = []
     for name in choices:
         console.print(f"[bold cyan]--- Backing up {name} ---[/bold cyan]")
-        result = MODULES[name](dest)
+        result = MODULES[name](dest, dry_run=dry_run)
         results.append(result)
         console.print("")
 

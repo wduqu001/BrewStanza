@@ -9,7 +9,7 @@ from brewstanza.backups.transaction import replace_text
 
 console = Console()
 
-def backup(backup_dir: Path) -> BackupResult:
+def backup(backup_dir: Path, *, dry_run: bool = False) -> BackupResult:
     if sys.platform != "darwin":
         console.print("[yellow]Skipped:[/yellow] App listing is only supported on macOS.")
         return BackupResult.skipped("Apps", "App listing is only supported on macOS.")
@@ -41,6 +41,12 @@ def backup(backup_dir: Path) -> BackupResult:
     apps_found.sort()
     
     dest_file = backup_dir / "apps_list.txt"
+    if dry_run:
+        console.print(
+            f"[cyan]Would back up:[/cyan] {len(apps_found)} app names to {dest_file}"
+        )
+        return BackupResult.success("Apps", f"Would back up {len(apps_found)} app names.", 1)
+
     try:
         replace_text("".join(f"{app}\n" for app in apps_found), dest_file)
         console.print(f"[green]Success:[/green] Backed up list of {len(apps_found)} apps to {dest_file}")  # noqa: E501
