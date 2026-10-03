@@ -8,10 +8,12 @@ on:
 
 jobs:
   test:
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.12"]
+        os: [macos-latest, ubuntu-latest]
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
 
     steps:
       - uses: actions/checkout@v6
@@ -34,7 +36,7 @@ jobs:
 
       - name: Lint with ruff
         run: |
-          ruff check src/
+          ruff check src/ tests/
 
       - name: Type-check with mypy
         run: |
@@ -43,6 +45,18 @@ jobs:
       - name: Test with pytest
         run: |
           pytest --cov=src/brewstanza --cov-report=xml --cov-fail-under=80 tests/
+
+      - name: Build package
+        run: |
+          python -m pip install build
+          python -m build
+
+      - name: Smoke-test installed wheel
+        run: |
+          python -m pip install --force-reinstall dist/*.whl
+          brewstanza --version
+          brewstanza --help
+          brewstanza backup --help
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
