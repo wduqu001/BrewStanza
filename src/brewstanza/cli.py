@@ -1,4 +1,6 @@
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 import click
@@ -6,6 +8,7 @@ from rich.console import Console
 from rich.panel import Panel
 
 from brewstanza.backups import apps, claude, fonts, git, homebrew, ssh, zsh
+from brewstanza.backups.package import create_snapshot, initialize_package
 from brewstanza.backups.results import BackupResult
 from brewstanza.backups.safety import ensure_dest_not_home, ensure_safe
 
@@ -47,6 +50,25 @@ def _validate_dest_for_choices(dest: Path, choices: list[str]) -> None:
 def main() -> None:
     """BrewStanza: Dotfile and App Backup Orchestrator."""
     pass
+
+@main.command()
+@click.option(
+    "--dest",
+    type=click.Path(path_type=Path),
+    default=DEFAULT_BACKUP_DIR,
+    help="Package directory to initialize.",
+)
+def init(dest: Path) -> None:
+    """Initialize a versioned backup package directory."""
+    try:
+        ensure_dest_not_home(dest)
+        uses_git = initialize_package(dest)
+    except (OSError, ValueError, subprocess.SubprocessError) as error:
+        raise click.ClickException(f"Could not initialize package {dest}: {error}") from error
+
+    integrity = "Git" if uses_git else "SHA-256 checksums"
+    console.print(f"[green]Package initialized:[/green] {dest} ({integrity})")
+
 
 @main.command()
 @click.option(
@@ -107,8 +129,8 @@ def backup(dest: Path, backup_all: bool, dry_run: bool) -> None:
     try:
         _validate_dest_for_choices(dest, choices)
         if not dry_run:
-            dest.mkdir(parents=True, exist_ok=True)
-    except (OSError, ValueError) as e:
+            initialize_package(dest)
+    except (OSError, ValueError, subprocess.SubprocessError) as e:
         raise click.ClickException(f"Invalid backup destination {dest}: {e}") from e
 
     mode = "Dry run" if dry_run else "Backup"
@@ -116,11 +138,29 @@ def backup(dest: Path, backup_all: bool, dry_run: bool) -> None:
     console.print(f"\n[bold]Starting backups for: {', '.join(choices)}[/bold]\n")
     
     results: list[BackupResult] = []
-    for name in choices:
-        console.print(f"[bold cyan]--- Backing up {name} ---[/bold cyan]")
-        result = MODULES[name](dest, dry_run=dry_run)
-        results.append(result)
-        console.print("")
+    if dry_run:
+        data_dir = dest
+        for name in choices:
+            console.print(f"[bold cyan]--- Backing up {name} ---[/bold cyan]")
+            result = MODULES[name](data_dir, dry_run=True)
+            results.append(result)
+            console.print("")
+    else:
+        try:
+            with tempfile.TemporaryDirectory(prefix=".brewstanza-stage-", dir=dest) as staging:
+                data_dir = Path(staging) / "data"
+                data_dir.mkdir()
+                for name in choices:
+                    console.print(f"[bold cyan]--- Backing up {name} ---[/bold cyan]")
+                    result = MODULES[name](data_dir, dry_run=False)
+                    results.append(result)
+                    console.print("")
+                snapshot = create_snapshot(dest, data_dir, results)
+        except (OSError, ValueError, subprocess.SubprocessError) as error:
+            raise click.ClickException(
+                f"Could not create backup package in {dest}: {error}"
+            ) from error
+        console.print(f"[bold]Snapshot:[/bold] {snapshot}")
 
     successes = sum(result.status == "success" for result in results)
     skipped = sum(result.status == "skipped" for result in results)

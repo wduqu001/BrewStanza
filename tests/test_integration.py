@@ -69,6 +69,7 @@ def fake_env(tmp_path, mocker):
     
     # Mock Homebrew subprocess to just write a fake Brewfile so we don't actually run brew
     mocker.patch("brewstanza.backups.homebrew.shutil.which", return_value="/usr/local/bin/brew")
+    mocker.patch("brewstanza.backups.package._git_executable", return_value=None)
     def fake_run(args, **kwargs):
         if "dump" in args:
             # extract the file path
@@ -91,28 +92,34 @@ def test_integration_full_backup(fake_env, tmp_path):
     
     assert result.exit_code == 0
     assert "Backup complete!" in result.output
+    snapshots = [path for path in dest.iterdir() if path.is_dir()]
+    assert len(snapshots) == 1
+    snapshot = snapshots[0]
+    assert (snapshot / "manifest.json").is_file()
+    assert (snapshot / "manifest.json").read_text().find('"status": "complete"') >= 0
+    data = snapshot / "data"
     
     # Verify Claude
-    assert (dest / ".claude" / "settings.json").exists()
+    assert (data / ".claude" / "settings.json").exists()
     
     # Verify Zsh
-    assert (dest / ".zsh" / "custom.zsh").exists()
-    assert (dest / ".zshrc").exists()
+    assert (data / ".zsh" / "custom.zsh").exists()
+    assert (data / ".zshrc").exists()
     
     # Verify Fonts
-    assert (dest / "Fonts" / "Arial.ttf").exists()
+    assert (data / "Fonts" / "Arial.ttf").exists()
     
     # Verify Git
-    assert (dest / ".gitconfig").read_text() == "[user]\nname=Test"
+    assert (data / ".gitconfig").read_text() == "[user]\nname=Test"
     
     # Verify SSH
-    assert (dest / ".ssh" / "config").read_text() == "Host *"
-    assert not (dest / ".ssh" / "id_rsa").exists() # Should ignore keys!
+    assert (data / ".ssh" / "config").read_text() == "Host *"
+    assert not (data / ".ssh" / "id_rsa").exists() # Should ignore keys!
     
     # Verify Apps (Should contain both RootApp and UserApp)
-    apps_list = (dest / "apps_list.txt").read_text()
+    apps_list = (data / "apps_list.txt").read_text()
     assert "RootApp.app" in apps_list
     assert "UserApp.app" in apps_list
     
     # Verify Homebrew
-    assert (dest / "Brewfile").read_text() == "brew 'python'\ncask 'google-chrome'"
+    assert (data / "Brewfile").read_text() == "brew 'python'\ncask 'google-chrome'"
