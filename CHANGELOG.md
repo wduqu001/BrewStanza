@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Versioned timestamped backup packages with `brewstanza init` support.
+- Local Git commits for complete snapshots, with SHA-256 checksums when Git is unavailable.
+- Partial snapshot retention without committing failed runs.
+
 ## [1.1.0] - 2026-05-05
 
 ### Added
@@ -23,7 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated documentation and development guidelines for the backup workflow.
 
 ### Removed
-- Inventory scanning, storage analytics, JSON export, and GitHub sync commands
+- Inventory scanning, storage analytics, full-machine JSON export, and GitHub sync commands
   are not part of the current backup-oriented release.
 
 ## [1.0.0] - 2026-04-14

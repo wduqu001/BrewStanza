@@ -16,13 +16,13 @@ home directory.
 ## Why people use BrewStanza
 
 - **Migrate faster:** collect important configuration files without guesswork.
-- **Avoid unnecessary exposure:** SSH keys are never copied, while the
-  sensitive-file policy for other configuration directories is being tightened.
+- **Avoid unnecessary exposure:** Claude and SSH backups use explicit file
+  selections; private SSH keys are never copied.
 - **Stay lightweight:** no background agent or full-screen UI is required.
 
 ## Current scope
 
-The current release provides `brewstanza init` and `brewstanza backup`, with modules for:
+The CLI provides `brewstanza init` and `brewstanza backup`, with modules for:
 
 - Claude configuration
 - Zsh configuration
@@ -32,12 +32,14 @@ The current release provides `brewstanza init` and `brewstanza backup`, with mod
 - SSH client configuration (never private keys)
 - Installed macOS application names
 
-The project does not currently provide storage analytics, JSON inventory
-exports, GitHub synchronization, or automated restore. Those are future
-features, not supported commands.
+The project does not provide storage analytics, full-machine inventory exports,
+remote GitHub synchronization, or automated restore. The app module does write
+a structured application manifest; restore and remote synchronization are not
+supported commands.
 
-See [docs/PRD_v1.1.md](docs/PRD_v1.1.md) and
-[docs/FDD_v1.1.md](docs/FDD_v1.1.md) for the current backup design.
+See [docs/PRD_v2.1.md](docs/PRD_v2.1.md) and
+[docs/FDD_v2.1.md](docs/FDD_v2.1.md) for the current product and implementation
+design.
 
 ## Installation
 
@@ -61,11 +63,12 @@ pip install -e .
 # Check install
 brewstanza --version
 
+# Optional: initialize a destination ahead of time, including an existing Git repo.
+# `backup` auto-initializes new/empty destinations and adopts existing packages/repos.
+brewstanza init --dest "$HOME/BrewStanza-Backup"
+
 # Back up every supported component
 brewstanza backup --all
-
-# Initialize a destination ahead of time (optional for new/empty destinations)
-brewstanza init --dest "$HOME/BrewStanza-Backup"
 
 # Back up selected components interactively
 brewstanza backup
@@ -91,13 +94,14 @@ Global flags:
 ## Backup policy
 
 The default destination is `~/BrewStanza-Backup/`. Each run creates a
-timestamped package directory with a versioned `manifest.json`. When Git is
-available, complete snapshots are committed locally; BrewStanza never pushes.
-Without Git, the manifest records SHA-256 checksums. Failed runs are retained
-as partial snapshots and are not committed. The CLI rejects the home directory
-as a destination, and modules reject destinations that overlap their sources.
+timestamped package directory with a versioned `manifest.json`. Initialization
+selects its integrity mode: Git-backed destinations commit complete snapshots
+locally, while destinations initialized without Git record SHA-256 checksums.
+BrewStanza never pushes. Failed runs are retained as partial snapshots and are
+not committed. The CLI rejects the home directory as a destination, and modules
+reject destinations that overlap their sources.
 An unrecognized non-empty non-Git destination is not modified; initialize a
-new/empty destination or use an existing Git repository.
+new/empty destination, or use an existing BrewStanza package or Git repository.
 
 The Claude module copies only `~/.claude/settings.json`; credentials, history,
 caches, logs, and unknown files are excluded. The SSH module copies only
@@ -117,8 +121,10 @@ brewstanza/
     ├── git.py
     ├── homebrew.py
     ├── package.py
+    ├── results.py
     ├── safety.py
     ├── ssh.py
+    ├── transaction.py
     └── zsh.py
 ```
 

@@ -1,9 +1,11 @@
 # Implementation Plan: Versioned Backup Packages
 
+**Status:** Implemented and verified (69 tests; Ruff; strict mypy).
+
 ## Files and responsibilities
 
 - `src/brewstanza/backups/package.py`: initialize package roots; stage timestamped snapshots; create versioned manifests, checksums, and local Git commits.
-- `src/brewstanza/cli.py`: add `init`; route backup module output into package staging; auto-initialize only absent/empty destinations.
+- `src/brewstanza/cli.py`: add `init`; route backup module output into package staging; initialize new/empty destinations and adopt existing BrewStanza packages or Git repositories.
 - `tests/test_package.py`: package validation, path mapping, checksum, Git, and failure behavior.
 - `tests/test_cli.py`: init and backup command lifecycle, including preservation of existing backup invocation behavior.
 - `tests/test_integration.py`: assert timestamped package layout and manifest against a complete fake-machine backup.
@@ -27,20 +29,20 @@
    - Implement Git operations scoped to the new snapshot so unrelated and uncommitted files are not staged.
 
 4. **CLI lifecycle (RED → GREEN)**
-   - Test `brewstanza init --dest`, automatic initialization for absent/empty backup destinations, and refusal of unrecognized non-empty destinations.
+   - Test `brewstanza init --dest`, automatic initialization for absent/empty backup destinations, adoption of existing Git repositories, and refusal of unrecognized non-empty non-Git destinations.
    - Update CLI orchestration to run existing modules against the staging layout and present the final timestamped destination.
    - Preserve dry-run behavior: no package initialization, snapshot, manifest, checksum, or Git mutation.
 
 5. **Integration and documentation**
    - Update integration expectations for package contents and validate manifest paths against actual files.
    - Run targeted tests, then the full pytest suite, Ruff, and strict mypy checks.
-   - Update `docs/TODO.md` only for the package format task; leave subsequent restore features unchecked.
+   - Update README, PRD/FDD, and `docs/TODO.md` to describe the package format and current CLI; leave subsequent restore features unchecked.
 
 ## Acceptance criteria
 
 - Every normal backup produces a timestamped, self-contained directory with a versioned JSON manifest.
 - Restore paths are home-relative; non-restorable references have `restore_path: null`.
-- Git is initialized/used when available; complete snapshots receive one local commit and no remote push occurs.
-- Without Git, each artifact has a SHA-256 checksum.
+- Initialization selects the integrity mode: Git-backed destinations commit complete snapshots locally; destinations initialized without Git record SHA-256 checksums.
+- No remote push occurs in either mode.
 - Failed runs are retained and marked partial but are not committed; skipped modules alone do not make a run partial.
 - Unrecognized non-empty non-Git destinations and dry runs are not modified; existing Git repositories are adopted with scoped commits.
