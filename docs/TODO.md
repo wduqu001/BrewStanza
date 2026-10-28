@@ -1,16 +1,17 @@
 # BrewStanza development checklist
 
 The current product is the backup orchestrator described in
-[PRD_v1.1.md](PRD_v1.1.md). Inventory scanning, storage analytics, JSON export,
-GitHub synchronization, and automated restore are future work and are not
-implemented CLI commands.
+[PRD_v1.1.md](PRD_v1.1.md). Storage analytics, GitHub synchronization, and
+automated restore are future work and are not implemented CLI commands.
 
 ## Current implementation
 
 - [x] Click CLI with `--version` and `backup` command
 - [x] Interactive component selection and `--all` execution
 - [x] Configurable backup destination
+- [x] Dry-run backup planning
 - [x] Claude, Zsh, Homebrew, Fonts, Git, SSH, and Apps modules
+- [x] Versioned application manifest with legacy app-list compatibility
 - [x] Homebrew availability and macOS-only module checks
 - [x] Destination overlap protection
 - [x] Unit and integration tests
@@ -41,8 +42,9 @@ implemented CLI commands.
 
 ### Future features
 
-- [ ] Add dry-run support
-- [x] Write a structured application manifest
-- [ ] Define and implement a versioned restore format
-- [ ] Add automated restore only after backup policy is stable
-- [ ] Add app categorization and an interactive TUI
+- [x] Define the versioned backup/restore package format
+- [ ] Add restore preview and path/overwrite safety validation
+- [ ] Implement limited restore for configuration files and directories
+- [ ] Add a separate Homebrew restore workflow
+- [ ] Add app categorization to the structured application manifest
+- [ ] Add an interactive TUI on top of the backup planning model

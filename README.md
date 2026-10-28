@@ -7,8 +7,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![macOS](https://img.shields.io/badge/macOS-Tahoe+-silver.svg)](https://www.apple.com/macos/)
 
-BrewStanza creates a portable backup directory for the configuration and
-environment files developers commonly need when moving to another machine.
+BrewStanza creates portable, timestamped backup packages for the configuration
+and environment files developers commonly need when moving to another machine.
 It works on macOS and Linux/WSL, skipping macOS-only modules when they are
 not available. It focuses on targeted backups rather than copying an entire
 home directory.
@@ -22,7 +22,7 @@ home directory.
 
 ## Current scope
 
-The current release provides one command, `brewstanza backup`, with modules for:
+The current release provides `brewstanza init` and `brewstanza backup`, with modules for:
 
 - Claude configuration
 - Zsh configuration
@@ -64,6 +64,9 @@ brewstanza --version
 # Back up every supported component
 brewstanza backup --all
 
+# Initialize a destination ahead of time (optional for new/empty destinations)
+brewstanza init --dest "$HOME/BrewStanza-Backup"
+
 # Back up selected components interactively
 brewstanza backup
 
@@ -75,6 +78,7 @@ brewstanza backup --dest "$HOME/BrewStanza-Backup"
 
 | Area | Command | What it does |
 |---|---|---|
+| Destination | `brewstanza init --dest PATH` | Initializes a package directory or adopts an existing Git repository |
 | Backup | `brewstanza backup --all` | Runs every available backup module |
 | Backup | `brewstanza backup` | Prompts for individual components |
 | Destination | `brewstanza backup --dest PATH` | Writes backups to a custom directory |
@@ -86,9 +90,14 @@ Global flags:
 
 ## Backup policy
 
-The default destination is `~/BrewStanza-Backup/`. The CLI rejects the home
-directory as a destination, and modules reject destinations that overlap their
-sources. Review the destination before running a full backup.
+The default destination is `~/BrewStanza-Backup/`. Each run creates a
+timestamped package directory with a versioned `manifest.json`. When Git is
+available, complete snapshots are committed locally; BrewStanza never pushes.
+Without Git, the manifest records SHA-256 checksums. Failed runs are retained
+as partial snapshots and are not committed. The CLI rejects the home directory
+as a destination, and modules reject destinations that overlap their sources.
+An unrecognized non-empty non-Git destination is not modified; initialize a
+new/empty destination or use an existing Git repository.
 
 The Claude module copies only `~/.claude/settings.json`; credentials, history,
 caches, logs, and unknown files are excluded. The SSH module copies only
@@ -107,6 +116,7 @@ brewstanza/
     ├── fonts.py
     ├── git.py
     ├── homebrew.py
+    ├── package.py
     ├── safety.py
     ├── ssh.py
     └── zsh.py
@@ -126,11 +136,9 @@ python -m mypy src/
 
 ## Roadmap
 
-- Explicit allowlists for sensitive configuration directories
-- Transactional backups that preserve the previous backup on failure
-- Dry-run support
-- Richer application manifest output
-- Automated restore after the backup format is stable
+- Restore preview and path/overwrite safety validation
+- Limited restore for configuration files and directories
+- Separate Homebrew restore workflow
 - App auto-categorization
 - Interactive TUI experience
 
